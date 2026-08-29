@@ -6,10 +6,12 @@ Item::Item(std::string _name, item_types _item_type, float _price, int _quantity
 	item_type = _item_type;
 	price = _price;
 	quantity = _quantity;
+	items++;
 }
 
 Item::~Item()
 {
+	items--;
 }
 
 // Print item infromation to the console
@@ -44,6 +46,14 @@ void Item::Display()
 	}
 
 	std::cout << "Price: $" << price << "\n";
-	std::cout << "Quantity: " << quantity << "\n";
+	std::cout << "Quantity: " << quantity << "\n\n";
+}
+
+void Item::SetType(int _item_type)
+{
+	if (_item_type == 0) { item_type = weapon; }
+	else if (_item_type == 1) { item_type = armour; }
+	else if (_item_type == 2) { item_type = consumable; }
+	else if (_item_type == 3) { item_type = utility; }
 }
 
