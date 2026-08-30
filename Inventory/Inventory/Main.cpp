@@ -13,11 +13,7 @@ Description :	Inventory System
 #include "FileInterface.h"
 #include "Item.h"
 #include "QuickSort.h"
-
-// TEMPORARY List declared for algorithims
-const int elements = 6;
-const int min = 0;
-const int max = 100;
+#include "DLinkedList.h"
 
 // Clear console text
 void ClearText()
@@ -68,17 +64,18 @@ std::string StringCheck(std::string _word)
 
 int main()
 {
-	QuickSort::SeedRnd();
-	int list[elements];
-	QuickSort::PopulateArray(&list[0], elements, min, max);
-
 	int action = 0;
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE); // Allows me to use colour in the console
 
 	FileInterface g_file_interface;
-	ItemManager g_item_manager;
+	DLinkedList g_list;
+
+	// TEMP DEFAULT INVENTORY
 	Item DSword("Diamond sword", weapon, 15.f, 2);
 	Item NSword("Netherite sword", weapon, 20.f, 1);
+	g_list.InsertHead(0, DSword);
+	g_list.InsertTail(1, NSword);
+
 
 	// While user hasn't exited
 	while (action != 8)
@@ -106,25 +103,35 @@ int main()
 		// Display Inventory
 		if (action == 1)
 		{
-			std::cout << "\nINVENTORY\n\n";
-			std::cout << "Total unique items: " << g_item_manager.GetItems() << "\n\n";
+			std::cout << "INVENTORY\n\n";
+			std::cout << "Total unique items: " << g_list.NumNodes() << "\n\n"; // Get the number of unique items in the list
 			DSword.Display();
 			NSword.Display();
 			std::cout << "\n";
+			// QuickSort::WriteList(&DSword);
 
-			QuickSort::WriteArray(&list[0], elements);
-			std::cout << "\n";
 		}
 
 		// Sort Inventory
 		if (action == 2)
 		{
-			QuickSort::PopulateArray(&list[0], elements, min, max);
-			QuickSort::WriteArray(&list[0], elements);
-			std::cout << "\n";
-			QuickSort::Sort(&list[0], elements);
-			QuickSort::WriteArray(&list[0], elements);
-			std::cout << "\n";
+			std::cout << "Name (1)\n";
+			std::cout << "Type (2)\n";
+			std::cout << "Price (3)\n";
+			std::cout << "Quantity (4)\n";
+
+			std::cout << "\nHow do you want to sort your inventory: ";
+			std::cin >> action;
+			NumCheck(action);
+
+			std::cout << "\nIn ascending (1) or descending (2) order: ";
+			std::cin >> action;
+			NumCheck(action);
+
+			//QuickSort::WriteArray(&list[0], elements);
+			//std::cout << "\n";
+			//QuickSort::Sort(&list[0], min, max);
+			//std::cout << "\n";
 		}
 
 		// Add item
@@ -135,6 +142,7 @@ int main()
 			float price;
 			int quantity;
 
+			SetConsoleTextAttribute(h, 9); // Bright blue text for input
 			std::cout << "Item name: ";
 			std::cin >> name;
 			StringCheck(name);
@@ -157,108 +165,125 @@ int main()
 			std::cin >> quantity;
 			NumCheck(quantity);
 
+			// Add a new item
 			Item NewItem(name, weapon, price, quantity);
-			NewItem.SetType(item_type);
-			NewItem.Display();
+			NewItem.SetType(item_type); // Type is inserted after
+			NewItem.Display(); // Display the new item to confirm details
+			g_list.InsertBody(100.f, 1, NewItem); // Insert the item in to the list
+
 		}
 
 		// Delete item
 		if (action == 4) 
 		{
-			SetConsoleTextAttribute(h, 9); // Bright blue text for input
+			std::string name;
+			std::cout << DSword.GetName() << "\n";
+
+			std::cin.clear();
+			std::cin.ignore(100000, '\n'); // Clears floating points
 
 			// Get user to select an item
-			do
-			{
-				std::cout << "Select an item to DELETE: ";
-				std::cin >> action;
-			} while (NumCheck(action) > elements); // Loop until user selects a valid item
-
-			SetConsoleTextAttribute(h, 7); // White text for display
-
-			std::cout << "\nAre you sure you want to DELETE this item?\n\n";
-			DSword.Display();
-
 			SetConsoleTextAttribute(h, 9); // Bright blue text for input
-			std::cout << "Yes (1) or No (0): ";
-			std::cin >> action;
-
-			if (action == 1)
+			std::cout << "Enter the EXACT name of an item to DELETE: ";
+			std::cin.ignore(100000, '\n'); // IMPORTANT FOR GETTING THE EXACT NAME
+			std::getline(std::cin, name);
+			
+			// See if the entered name matches the items name
+			if (name.compare(DSword.GetName()))
 			{
-				// Delete item
+				SetConsoleTextAttribute(h, 7); // White text for display
+				std::cout << "\nAre you sure you want to DELETE " << DSword.GetName() << "?\n\n";
+				DSword.Display();
+
+				SetConsoleTextAttribute(h, 9); // Bright blue text for input
+				std::cout << "Yes (1) or No (0): ";
+				std::cin >> action;
+
+				// Delete the node containing the item
+				if (action == 1)
+				{
+					g_list.DeleteHead();
+				}
 			}
 		}
 
 		// Edit item
 		if (action == 5) 
 		{
-			SetConsoleTextAttribute(h, 9); // Bright blue text for input
-			
+			std::string name;
+			std::cout << DSword.GetName() << "\n";
+
+			std::cin.clear();
+			std::cin.ignore(100000, '\n'); // Clears floating points
+
 			// Get user to select an item
-			do
-			{
-				std::cout << "Select an item to EDIT: ";
-				std::cin >> action;
-			} while (NumCheck(action) > elements); // Loop until user selects a valid item
-
-			SetConsoleTextAttribute(h, 7); // White text for display
-			DSword.Display();
-
-			// Prompt user to change stat
-			std::cout << "\nWhat STAT do you want to edit\n\n";
-			std::cout << "Name (1)\n";
-			std::cout << "Type (2)\n";
-			std::cout << "Price (3)\n";
-			std::cout << "Quantity (4)\n";
-			
 			SetConsoleTextAttribute(h, 9); // Bright blue text for input
-			std::cout << "Please enter an type: ";
-			std::cin >> action;
+			std::cout << "Enter the name of an item to DELETE: ";
+			std::cin.ignore(100000, '\n'); // Clears floating points
+			std::getline(std::cin, name);
 
-			// Edit name
-			if (action == 1) 
+			// See if the entered name matches the items name
+			if (name.compare(DSword.GetName()))
 			{
-				std::string name = "";
-				std::cout << "Please enter a new name: ";
-				std::cin >> name;
-				StringCheck(name);
-				DSword.SetName(name);
-			}
+				SetConsoleTextAttribute(h, 7); // White text for display
+				DSword.Display();
 
-			// Edit type
-			if (action == 2)
-			{
-				std::cout << "What TYPE do you want to set to\n\n";
-				std::cout << "Weapon (0)\n";
-				std::cout << "Armour (1)\n";
-				std::cout << "Consumable (2)\n";
-				std::cout << "Utility (3)\n";
+				// Prompt user to change stat
+				std::cout << "\nWhat STAT do you want to edit\n\n";
+				std::cout << "Name (1)\n";
+				std::cout << "Type (2)\n";
+				std::cout << "Price (3)\n";
+				std::cout << "Quantity (4)\n";
 
 				SetConsoleTextAttribute(h, 9); // Bright blue text for input
-				std::cout << "Please enter an action: ";
+				std::cout << "Please enter an type: ";
 				std::cin >> action;
-				NumCheck(action);
-				DSword.SetType(action);
-			}
 
-			// Edit price
-			if (action == 3)
-			{
-				float price = 0.f;
-				std::cout << "Please enter a new price: ";
-				std::cin >> price;
-				NumCheck(price);
-				DSword.SetPrice(price);
-			}
+				// Edit name
+				if (action == 1)
+				{
+					std::string name = "";
+					std::cout << "Please enter a new name: ";
+					std::cin >> name;
+					StringCheck(name);
+					DSword.SetName(name);
+				}
 
-			// Edit quantity
-			if (action == 4)
-			{
-				int quantity = 0;
-				std::cout << "Please enter a new quantity: ";
-				std::cin >> quantity;
-				NumCheck(quantity);
-				DSword.SetQuantity(quantity);
+				// Edit type
+				if (action == 2)
+				{
+					std::cout << "What TYPE do you want to set to\n\n";
+					std::cout << "Weapon (0)\n";
+					std::cout << "Armour (1)\n";
+					std::cout << "Consumable (2)\n";
+					std::cout << "Utility (3)\n";
+
+					SetConsoleTextAttribute(h, 9); // Bright blue text for input
+					std::cout << "Please enter an action: ";
+					std::cin >> action;
+					NumCheck(action);
+					DSword.SetType(action);
+				}
+
+				// Edit price
+				if (action == 3)
+				{
+					float price = 0.f;
+					std::cout << "Please enter a new price: ";
+					std::cin >> price;
+					NumCheck(price);
+					DSword.SetPrice(price);
+				}
+
+				// Edit quantity
+				if (action == 4)
+				{
+					int quantity = 0;
+					std::cout << "Please enter a new quantity: ";
+					std::cin >> quantity;
+					NumCheck(quantity);
+					DSword.SetQuantity(quantity);
+				}
 			}
 
 		}

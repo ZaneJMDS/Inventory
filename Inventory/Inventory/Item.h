@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include "ItemManager.h"
 
 enum item_types
 {
@@ -11,9 +10,10 @@ enum item_types
 	utility
 };
 
-class Item : public ItemManager
+class Item
 {
 public:
+	Item();
 	Item(std::string _name, item_types _item_type, float _price, int _quantity);
 	~Item();
 
@@ -24,6 +24,8 @@ public:
 	void SetType(int _item_type);
 	void SetPrice(float _price) { price = _price; }
 	void SetQuantity(int _quantity) { quantity = _quantity; }
+	std::string GetName() { return name; }
+	int GetQuantity() { return quantity; }
 
 private:
 	std::string name;

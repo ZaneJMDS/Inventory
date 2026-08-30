@@ -1,17 +1,23 @@
 #include "Item.h"
 
+Item::Item()
+{
+	name = "Default";
+	item_type = weapon;
+	price = 1.f;
+	quantity = 1;
+}
+
 Item::Item(std::string _name, item_types _item_type, float _price, int _quantity)
 {
 	name = _name;
 	item_type = _item_type;
 	price = _price;
 	quantity = _quantity;
-	items++;
 }
 
 Item::~Item()
 {
-	items--;
 }
 
 // Print item infromation to the console
