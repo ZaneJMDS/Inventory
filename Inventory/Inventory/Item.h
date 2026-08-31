@@ -18,6 +18,7 @@ public:
 	~Item();
 
 	void Display();
+	std::string WriteItem();
 	
 	// Setters 
 	void SetName(std::string _name) { name = _name; }

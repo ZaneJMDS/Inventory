@@ -144,14 +144,12 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Node.cpp" />
-    <ClCompile Include="QuickSort.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DLinkedList.h" />
     <ClInclude Include="FileInterface.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Node.h" />
-    <ClInclude Include="QuickSort.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

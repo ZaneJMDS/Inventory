@@ -1,5 +1,6 @@
 #include "DLinkedList.h"
 
+// Creates a list with no nodes
 DLinkedList::DLinkedList()
 {
 	mpHead = nullptr;
@@ -263,5 +264,98 @@ bool DLinkedList::IsEmpty()
 	return true;
 }
 
+// Display every node in the list to console
+void DLinkedList::DisplayAll()
+{
+	std::cout << "Total unique items: " << NumNodes() << "\n"; // Get the number of unique items in the list
+	std::cout << "Name, Type, Price, Quantity\n";
+	Node* curr = mpHead;
+	while (curr != nullptr) {
+		curr->GetValue().Display();
+		curr = curr->GetNext();
+	}
+}
 
+// Write every node in the list to file
+void DLinkedList::WriteAll()
+{
+	myfile.open("example.txt");
+	myfile << "Name, Type, Price, Quantity\n";
+	Node* curr = mpHead;
+	while (curr != nullptr) {
+		myfile << curr->GetValue().WriteItem();
+		myfile << "\n";
+		curr = curr->GetNext();
+	}
+	std::cout << "SUCCESS\n";
+	myfile.close();
+}
 
+// Swap the values of 2 nodes in the list
+void DLinkedList::Swap(Node* a, Node* b)
+{
+	Item temp = a->GetValue();
+	a->SetValue(b->GetValue());
+	b->SetValue(temp);
+}
+
+Node* DLinkedList::Partition(Node* _min, Node* _max)
+{
+	// Set pivot to the high node
+	int pivot = _max->GetValue().GetQuantity();
+
+	// Pointer to place smaller elements
+	Node* i = _min->GetPrevious();
+
+	for (Node* j = _min; j != _max; j = j->GetNext())
+	{
+		if (j->GetValue().GetQuantity() <= pivot)
+		{
+			// Move i forward and swap with j
+			i = (i == nullptr) ? _min : i->GetNext();
+			Swap(i, j);
+		}
+	}
+
+	// Move i to the correct pivot position
+	i = (i == nullptr) ? _min : i->GetNext();
+
+	// Swap pivot with i's data
+	Swap(i, _max);
+
+	return i;
+}
+
+// Order the list
+void DLinkedList::QuickSort(Node* _min, Node* _max)
+{
+	if (_min != nullptr && _max != nullptr && _min != _max && _min != _max->GetNext())
+	{
+		// Find the pivot
+		Node* pivot = Partition(_min, _max);
+
+		// Sort left half
+		QuickSort(_min, pivot->GetPrevious());
+
+		// Sort right half
+		QuickSort(pivot->GetNext(), _max);
+	}
+}
+
+void DLinkedList::Sort()
+{
+	// Quick sort starting at the head and going through to the last node
+	QuickSort(mpHead, FindNode(NumNodes()));
+}
+
+// Searches the list for the name
+bool DLinkedList::SearchList(std::string _name)
+{
+	Node* curr = mpHead;
+	while (curr != nullptr) {
+		if (_name.compare(curr->GetValue().GetName()) == 0) { return true; }
+		curr = curr->GetNext();
+	}
+
+	return false;
+}

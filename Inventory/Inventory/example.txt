@@ -1,1 +1,5 @@
-TEST 2.
+Name, Type, Price, Quantity
+Diamond sword, Weapon, $15.000000, 2
+Netherite sword, Weapon, $20.000000, 1
+awwad, Armour, $23.000000, 2
+fourty, Consumable, $23.000000, 1

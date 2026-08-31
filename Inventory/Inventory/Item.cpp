@@ -23,36 +23,68 @@ Item::~Item()
 // Print item infromation to the console
 void Item::Display()
 {
-	std::cout << "Name: " << name << "\n";
-	std::cout << "Type: ";
+	std::cout << name << ", ";
 	switch (item_type)
 	{
 	case weapon:
 	{
-		std::cout << "Weapon\n";
+		std::cout << "Weapon, ";
 	}
 	break;
 
 	case armour:
 	{
-		std::cout << "Armour\n";
+		std::cout << "Armour, ";
 	}
 	break;
 
 	case consumable:
 	{
-		std::cout << "Consumable\n";
+		std::cout << "Consumable, ";
 	}
 	break;
 
 	case utility:
 	{
-		std::cout << "Utility\n";
+		std::cout << "Utility, ";
 	}
 	}
 
-	std::cout << "Price: $" << price << "\n";
-	std::cout << "Quantity: " << quantity << "\n\n";
+	std::cout << "$" << price << ", ";
+	std::cout << quantity << "\n";
+}
+
+// Print item infromation to text file
+std::string Item::WriteItem()
+{
+	std::string item_type_string = "";
+	switch (item_type)
+	{
+	case weapon:
+	{
+		item_type_string = "Weapon, ";
+	}
+	break;
+
+	case armour:
+	{
+		item_type_string = "Armour, ";
+	}
+	break;
+
+	case consumable:
+	{
+		item_type_string = "Consumable, ";
+	}
+	break;
+
+	case utility:
+	{
+		item_type_string = "Utility, ";
+	}
+	}
+	std::string item_info = name + ", " + item_type_string + "$" + std::to_string(price) + ", " + std::to_string(quantity);
+	return item_info;
 }
 
 void Item::SetType(int _item_type)

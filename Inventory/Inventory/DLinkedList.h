@@ -1,5 +1,6 @@
 #pragma once
 #include "Node.h"
+#include "FileInterface.h"
 
 class DLinkedList
 {
@@ -24,9 +25,20 @@ public:
 
 	bool IsEmpty();
 	int NumNodes() { return nodes; };
+	
+	void DisplayAll();
+	void WriteAll();
+
+	void Swap(Node* a, Node* b);
+	Node* Partition(Node* _min, Node* _max);
+	void QuickSort(Node* _min, Node* _max);
+	void Sort();
+
+	bool SearchList(std::string _name);
 
 protected:
 	Node* mpHead;
 	int nodes;
+	std::ofstream myfile;
 };
 

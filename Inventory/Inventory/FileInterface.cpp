@@ -11,10 +11,8 @@ FileInterface::~FileInterface()
 // TODO
 void FileInterface::SaveFile()
 {
-	myfile.open("example.txt");
-	myfile << "TEST 2.\n";
-	std::cout << "SUCCESS\n";
-	myfile.close();
+	// myfile.open("example.txt");
+	// _list.WriteAll(myfile);
 
 	//HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
@@ -76,13 +74,6 @@ void FileInterface::SaveFile()
 void FileInterface::LoadFile()
 {
 	std::string line;
-
-	myfile.open("example.txt");
-	//while (getline(myfile, line))
-	//{
-	//	std::cout << line << std::endl;
-	//}
-	myfile.close();
 
 	//HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include "DLinkedList.h"
 
 class FileInterface
 {
@@ -14,6 +15,6 @@ public:
 	void SaveFile();
 	void LoadFile();
 
-	std::ofstream myfile;
+	// std::ofstream myfile;
 };
 
