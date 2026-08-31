@@ -70,7 +70,7 @@ int main()
 	DLinkedList g_list;
 
 	// TEMP DEFAULT INVENTORY
-	Item IPick("Iron Sword", utility, 10.f, 2);
+	Item IPick("Iron Pick", utility, 10.f, 2);
 	Item DSword("Diamond sword", weapon, 15.f, 4);
 	Item NSword("Netherite sword", weapon, 20.f, 1);
 	g_list.InsertHead(0, IPick);
@@ -114,6 +114,9 @@ int main()
 		// Sort Inventory
 		if (action == 2)
 		{
+			int sort_type = 0;
+			bool sort_order = 0;
+
 			std::cout << "Name (1)\n";
 			std::cout << "Type (2)\n";
 			std::cout << "Price (3)\n";
@@ -121,15 +124,15 @@ int main()
 
 			// Ask the user what variable they want to sort their inventory by
 			std::cout << "\nHow do you want to sort your inventory: ";
-			std::cin >> action;
-			NumCheck(action);
+			std::cin >> sort_type;
+			NumCheck(sort_type);
 
-			std::cout << "\nIn ascending (1) or descending (2) order: ";
-			std::cin >> action;
-			NumCheck(action);
+			std::cout << "\nIn ascending (0) or descending (1) order: ";
+			std::cin >> sort_order;
+			NumCheck(sort_order);
 
 			std::cout << "\n";
-			g_list.Sort();
+			g_list.Sort(sort_type, sort_order);
 			g_list.DisplayAll();
 		}
 
@@ -150,7 +153,7 @@ int main()
 				std::cin.ignore(100000, '\n'); // Clears floating points
 				std::cout << "Item name (Has to be unique): ";
 				std::getline(std::cin, name);
-			} while (g_list.SearchList(name));
+			} while (g_list.SearchList(name) != -1);
 
 			// Display selectable types
 			std::cout << "Weapon (0)\n";
@@ -182,7 +185,7 @@ int main()
 		if (action == 4) 
 		{
 			std::string name = "";
-			std::cout << DSword.GetName() << std::endl;
+			g_list.DisplayAll();
 
 			std::cin.clear();
 			std::cin.ignore(100000, '\n'); // Clears floating points
@@ -192,12 +195,14 @@ int main()
 			std::cout << "Enter the EXACT name of an item to DELETE: ";
 			std::getline(std::cin, name);
 			
+			int position = g_list.SearchList(name);
+
 			// See if the entered name matches any item's name
-			if (g_list.SearchList(name)) // 0 is true for some reason
+			if (position != -1)
 			{
 				SetConsoleTextAttribute(h, 7); // White text for display
-				std::cout << "\nAre you sure you want to DELETE " << DSword.GetName() << "?\n\n";
-				DSword.Display();
+				std::cout << "\nAre you sure you want to DELETE?\n";
+				g_list.GetNode(position)->GetValue().Display();
 
 				SetConsoleTextAttribute(h, 9); // Bright blue text for input
 				std::cout << "Yes (1) or No (0): ";
@@ -206,7 +211,7 @@ int main()
 				// Delete the node containing the item
 				if (action == 1)
 				{
-					g_list.DeleteHead();
+					g_list.DeleteBody(position);
 				}
 			}
 
@@ -220,7 +225,7 @@ int main()
 		if (action == 5) 
 		{
 			std::string name;
-			std::cout << DSword.GetName() << "\n";
+			g_list.DisplayAll();
 
 			std::cin.clear();
 			std::cin.ignore(100000, '\n'); // Clears floating points
@@ -230,11 +235,13 @@ int main()
 			std::cout << "Enter the name of an item to EDIT: ";
 			std::getline(std::cin, name);
 
+			int position = g_list.SearchList(name);
+
 			// See if the entered name matches the items name
-			if (g_list.SearchList(name))
+			if (position != -1)
 			{
 				SetConsoleTextAttribute(h, 7); // White text for display
-				DSword.Display();
+				g_list.GetNode(position)->GetValue().Display();
 
 				// Prompt user to change stat
 				std::cout << "\nWhat STAT do you want to edit\n\n";
@@ -254,7 +261,7 @@ int main()
 					std::cout << "Please enter a new name: ";
 					std::cin >> name;
 					StringCheck(name);
-					DSword.SetName(name);
+					g_list.GetNode(position)->GetValue().SetName(name);
 				}
 
 				// Edit type
@@ -270,7 +277,7 @@ int main()
 					std::cout << "Please enter an action: ";
 					std::cin >> action;
 					NumCheck(action);
-					DSword.SetType(action);
+					g_list.GetNode(position)->GetValue().SetType(action);
 				}
 
 				// Edit price
@@ -280,7 +287,7 @@ int main()
 					std::cout << "Please enter a new price: ";
 					std::cin >> price;
 					NumCheck(price);
-					DSword.SetPrice(price);
+					g_list.GetNode(position)->GetValue().SetPrice(price);
 				}
 
 				// Edit quantity
@@ -290,7 +297,7 @@ int main()
 					std::cout << "Please enter a new quantity: ";
 					std::cin >> quantity;
 					NumCheck(quantity);
-					DSword.SetQuantity(quantity);
+					g_list.GetNode(position)->GetValue().SetQuantity(quantity);
 				}
 			}
 

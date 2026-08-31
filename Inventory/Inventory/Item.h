@@ -26,6 +26,8 @@ public:
 	void SetPrice(float _price) { price = _price; }
 	void SetQuantity(int _quantity) { quantity = _quantity; }
 	std::string GetName() { return name; }
+	item_types GetType() { return item_type; }
+	float GetPrice() { return price; }
 	int GetQuantity() { return quantity; }
 
 private:

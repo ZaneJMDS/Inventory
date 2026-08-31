@@ -32,13 +32,15 @@ public:
 	void Swap(Node* a, Node* b);
 	Node* Partition(Node* _min, Node* _max);
 	void QuickSort(Node* _min, Node* _max);
-	void Sort();
+	void Sort(int _sort_type, bool _sort_order);
 
-	bool SearchList(std::string _name);
+	int SearchList(std::string _name);
 
 protected:
 	Node* mpHead;
 	int nodes;
+	int sort_type = 4;
+	bool sort_order = 0;
 	std::ofstream myfile;
 };
 

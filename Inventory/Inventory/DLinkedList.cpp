@@ -140,7 +140,7 @@ Node* DLinkedList::ExtractHead()
 	}
 
 	Node* pReturn = mpHead;
-	Node* pNewHead = mpHead->GetNext();
+	Node* pNewHead = mpHead->GetNext(); // New head becomes the second node in the list
 	nodes--;
 
 	return pReturn;
@@ -227,7 +227,8 @@ Node* DLinkedList::GetNode(int iPosition)
 			iCurrentPosition++;
 		}
 
-		return pCurrent;
+		Node* pReturn = pCurrent->GetNext();
+		return pReturn;
 	}
 
 	return nullptr;
@@ -251,7 +252,8 @@ Node* DLinkedList::FindNode(int iKey)
 			iCurrentPosition++;
 		}
 
-		return pCurrent;
+		Node* pReturn = pCurrent->GetNext();
+		return pReturn;
 	}
 
 	return nullptr;
@@ -299,21 +301,131 @@ void DLinkedList::Swap(Node* a, Node* b)
 	b->SetValue(temp);
 }
 
+// List used for quick sort segment
 Node* DLinkedList::Partition(Node* _min, Node* _max)
 {
-	// Set pivot to the high node
-	int pivot = _max->GetValue().GetQuantity();
-
 	// Pointer to place smaller elements
 	Node* i = _min->GetPrevious();
 
+	// Iterate through list
 	for (Node* j = _min; j != _max; j = j->GetNext())
 	{
-		if (j->GetValue().GetQuantity() <= pivot)
+		// Ascending order
+		if (sort_order)
 		{
-			// Move i forward and swap with j
-			i = (i == nullptr) ? _min : i->GetNext();
-			Swap(i, j);
+			// Name
+			if (sort_type == 1)
+			{
+				std::string pivot = _max->GetValue().GetName();
+
+				if (j->GetValue().GetName() >= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
+
+			// Type
+			else if (sort_type == 2)
+			{
+				// Set pivot to the high node
+				int pivot = _max->GetValue().GetType();
+
+				if (j->GetValue().GetType() >= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
+
+			// Price
+			else if (sort_type == 3)
+			{
+				// Set pivot to the high node
+				float pivot = _max->GetValue().GetPrice();
+
+				if (j->GetValue().GetPrice() >= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
+
+			// Quantity
+			else
+			{
+				// Set pivot to the high node
+				int pivot = _max->GetValue().GetQuantity();
+
+				if (j->GetValue().GetQuantity() >= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
+		}
+
+		// Descending order
+		else
+		{
+			// Name
+			if (sort_type == 1)
+			{
+				std::string pivot = _max->GetValue().GetName();
+
+				if (j->GetValue().GetName() <= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
+
+			// Type
+			else if (sort_type == 2)
+			{
+				// Set pivot to the high node
+				int pivot = _max->GetValue().GetType();
+
+				if (j->GetValue().GetType() <= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
+
+			// Price
+			else if (sort_type == 3)
+			{
+				// Set pivot to the high node
+				float pivot = _max->GetValue().GetPrice();
+
+				if (j->GetValue().GetPrice() <= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
+
+			// Quantity
+			else
+			{
+				// Set pivot to the high node
+				int pivot = _max->GetValue().GetQuantity();
+
+				if (j->GetValue().GetQuantity() <= pivot)
+				{
+					// Move i forward and swap with j
+					i = (i == nullptr) ? _min : i->GetNext();
+					Swap(i, j);
+				}
+			}
 		}
 	}
 
@@ -342,20 +454,27 @@ void DLinkedList::QuickSort(Node* _min, Node* _max)
 	}
 }
 
-void DLinkedList::Sort()
+void DLinkedList::Sort(int _sort_type, bool _sort_order)
 {
+	sort_type = _sort_type;
+	sort_order = _sort_order;
+
 	// Quick sort starting at the head and going through to the last node
 	QuickSort(mpHead, FindNode(NumNodes()));
 }
 
 // Searches the list for the name
-bool DLinkedList::SearchList(std::string _name)
+int DLinkedList::SearchList(std::string _name)
 {
+	// Search for position of node from name
+	int position = -1; // I dunno why it works at this value
 	Node* curr = mpHead;
 	while (curr != nullptr) {
-		if (_name.compare(curr->GetValue().GetName()) == 0) { return true; }
+		if (_name.compare(curr->GetValue().GetName()) == 0) { return position; }
+		position++;
 		curr = curr->GetNext();
 	}
 
-	return false;
+	// Couldn't find
+	return -1;
 }
