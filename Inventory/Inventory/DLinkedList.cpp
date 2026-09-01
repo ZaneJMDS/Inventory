@@ -28,6 +28,7 @@ void DLinkedList::InsertHead(int iKey, Item _value)
 	Node* pNew = new Node(iKey);
 	pNew->SetValue(_value);
 
+	// Set the head as the next node in the list
 	pNew->SetNext(mpHead);
 	mpHead = pNew;
 
@@ -41,7 +42,7 @@ void DLinkedList::InsertTail(int iKey, Item _value)
 	Node* pNew = new Node(iKey);
 	pNew->SetValue(_value);
 
-	if (nodes > 0) // List is not empty
+	if (!IsEmpty()) // List is not empty
 	{
 		// Find the Tail
 		Node* pCurrent = mpHead;
@@ -51,6 +52,8 @@ void DLinkedList::InsertTail(int iKey, Item _value)
 		{
 			pCurrent = pCurrent->GetNext();
 		}
+		
+		// Set the node to one after the previous tail node
 		pCurrent->SetNext(pNew);
 	}
 
@@ -65,17 +68,17 @@ void DLinkedList::InsertTail(int iKey, Item _value)
 // Insert a node at the middle of the list
 void DLinkedList::InsertBody(int iPosition, int iKey, Item _value)
 {
-	if (iPosition == 0) { InsertHead(iKey, _value); } // If no nodes already exist
+	if (iPosition == start_pos) { InsertHead(iKey, _value); } // If no nodes already exist
 
 	else
 	{
-		// The head node is position 0
-		if (iPosition < 0)
+		// Out of list
+		if (iPosition < start_pos)
 		{
 			throw "Parameter iPosition is less than 0";
 		}
 
-
+		// Out of list
 		if (iPosition >= nodes)
 		{
 			throw "Parameter iPosition exceeds length of list";
@@ -87,7 +90,7 @@ void DLinkedList::InsertBody(int iPosition, int iKey, Item _value)
 
 		// Find the position to insert
 		Node* pCurrent = mpHead;
-		for (int iCurrentPosition = 0; iCurrentPosition < iPosition - 1; iCurrentPosition++)
+		for (int iCurrentPosition = start_pos; iCurrentPosition < iPosition - 1; iCurrentPosition++)
 		{
 			pCurrent = pCurrent->GetNext();
 		}
@@ -140,7 +143,8 @@ Node* DLinkedList::ExtractHead()
 	}
 
 	Node* pReturn = mpHead;
-	Node* pNewHead = mpHead->GetNext(); // New head becomes the second node in the list
+	mpHead = mpHead->GetNext(); // New head becomes the second node in the list
+
 	nodes--;
 
 	return pReturn;
@@ -168,6 +172,7 @@ Node* DLinkedList::ExtractTail()
 		}
 		Node* pTail = pCurrent->GetNext();
 		pCurrent->SetNext(nullptr);
+		nodes--;
 
 		return pTail;
 	}
@@ -175,12 +180,12 @@ Node* DLinkedList::ExtractTail()
 
 Node* DLinkedList::ExtractBody(int iPosition)
 {
-	if (nodes == 0 || iPosition < 0 || iPosition >= nodes)
+	if (nodes == 0 || iPosition < start_pos || iPosition > nodes)
 	{
 		throw "cannot extract node from an empty list / out of bounds";
 	}
 
-	else if (iPosition == 1)
+	else if (iPosition == start_pos)
 	{
 		ExtractHead();
 	}
@@ -194,7 +199,7 @@ Node* DLinkedList::ExtractBody(int iPosition)
 	else
 	{
 		Node* pCurrent = mpHead;
-		int iCurrentPosition = 0;
+		int iCurrentPosition = start_pos;
 		while (iCurrentPosition < iPosition - 1)
 		{
 			pCurrent = pCurrent->GetNext();
@@ -203,6 +208,7 @@ Node* DLinkedList::ExtractBody(int iPosition)
 		Node* pReturn = pCurrent->GetNext();
 		pCurrent->SetNext(pReturn->GetNext());
 		nodes--;
+
 		return pReturn;
 	}
 
@@ -212,7 +218,7 @@ Node* DLinkedList::ExtractBody(int iPosition)
 // Return a node using the position
 Node* DLinkedList::GetNode(int iPosition)
 {
-	if (nodes == 0 || iPosition < 0 || iPosition >= nodes)
+	if (IsEmpty() || iPosition < start_pos || iPosition > nodes)
 	{
 		throw "cannot extract node from an empty list / out of bounds";
 	}
@@ -220,15 +226,14 @@ Node* DLinkedList::GetNode(int iPosition)
 	else
 	{
 		Node* pCurrent = mpHead;
-		int iCurrentPosition = 0;
-		while (iCurrentPosition < iPosition - 1)
+		int iCurrentPosition = start_pos;
+		while (iCurrentPosition < iPosition)
 		{
 			pCurrent = pCurrent->GetNext();
 			iCurrentPosition++;
 		}
 
-		Node* pReturn = pCurrent->GetNext();
-		return pReturn;
+		return pCurrent;
 	}
 
 	return nullptr;
@@ -245,15 +250,14 @@ Node* DLinkedList::FindNode(int iKey)
 	else
 	{
 		Node* pCurrent = mpHead;
-		int iCurrentPosition = 0;
+		int iCurrentPosition = start_pos;
 		while (iCurrentPosition < iKey - 1)
 		{
 			pCurrent = pCurrent->GetNext();
 			iCurrentPosition++;
 		}
 
-		Node* pReturn = pCurrent->GetNext();
-		return pReturn;
+		return pCurrent;
 	}
 
 	return nullptr;
@@ -270,7 +274,7 @@ bool DLinkedList::IsEmpty()
 void DLinkedList::DisplayAll()
 {
 	std::cout << "Total unique items: " << NumNodes() << "\n"; // Get the number of unique items in the list
-	std::cout << "Name, Type, Price, Quantity\n";
+	std::cout << "NAME, TYPE, PRICE, QUANTITY\n";
 	Node* curr = mpHead;
 	while (curr != nullptr) {
 		curr->GetValue().Display();
@@ -282,7 +286,8 @@ void DLinkedList::DisplayAll()
 void DLinkedList::WriteAll()
 {
 	myfile.open("example.txt");
-	myfile << "Name, Type, Price, Quantity\n";
+	myfile << "Total unique items: " << NumNodes() << "\n"; // Get the number of unique items in the list
+	myfile << "NAME, TYPE, PRICE, QUANTITY\n";
 	Node* curr = mpHead;
 	while (curr != nullptr) {
 		myfile << curr->GetValue().WriteItem();
@@ -316,9 +321,10 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Name
 			if (sort_type == 1)
 			{
-				std::string pivot = _max->GetValue().GetName();
+				std::string name = _max->GetValue().GetName();
+				// char pivot = name[0];
 
-				if (j->GetValue().GetName() >= pivot)
+				if (j->GetValue().GetName() >= name)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -467,7 +473,7 @@ void DLinkedList::Sort(int _sort_type, bool _sort_order)
 int DLinkedList::SearchList(std::string _name)
 {
 	// Search for position of node from name
-	int position = -1; // I dunno why it works at this value
+	int position = start_pos;
 	Node* curr = mpHead;
 	while (curr != nullptr) {
 		if (_name.compare(curr->GetValue().GetName()) == 0) { return position; }

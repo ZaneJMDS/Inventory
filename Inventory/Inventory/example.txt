@@ -1,5 +1,6 @@
-Name, Type, Price, Quantity
-Diamond sword, Weapon, $15.000000, 2
+Total unique items: 4
+NAME, TYPE, PRICE, QUANTITY
+Iron Pick, Utility, $10.000000, 2
+Diamond sword, Weapon, $15.000000, 4
 Netherite sword, Weapon, $20.000000, 1
-awwad, Armour, $23.000000, 2
-fourty, Consumable, $23.000000, 1
+yes, Consumable, $6.700000, 23

@@ -37,10 +37,11 @@ public:
 	int SearchList(std::string _name);
 
 protected:
-	Node* mpHead;
+	Node* mpHead; // Start location
 	int nodes;
-	int sort_type = 4;
-	bool sort_order = 0;
-	std::ofstream myfile;
+	const int start_pos = 0; // Location of the Head node
+	int sort_type = 4; // Can be any of the item types
+	bool sort_order = 0; // 0 for ascending and 1 for descending
+	std::ofstream myfile; // Saving and loading to file
 };
 

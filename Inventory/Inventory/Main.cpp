@@ -40,6 +40,21 @@ int NumCheck(int _num)
 	return _num;
 }
 
+float NumCheck(float _num)
+{
+	// Don't accept a number less than or equal to 0
+	while (std::cin.fail() || _num < 0 || _num > 100)
+	{
+		std::cin.clear();
+
+		// Keep prompting them until they get it right
+		std::cout << "Please enter a valid integer between 0 and 100: ";
+		std::cin >> _num;
+	}
+
+	return _num;
+}
+
 // Check input is a letter
 std::string StringCheck(std::string _word)
 {
@@ -185,6 +200,9 @@ int main()
 		if (action == 4) 
 		{
 			std::string name = "";
+			int item_type;
+			float price;
+			int quantity;
 			g_list.DisplayAll();
 
 			std::cin.clear();
