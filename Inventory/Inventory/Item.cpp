@@ -62,28 +62,28 @@ std::string Item::WriteItem()
 	{
 	case weapon:
 	{
-		item_type_string = "Weapon, ";
+		item_type_string = "Weapon,";
 	}
 	break;
 
 	case armour:
 	{
-		item_type_string = "Armour, ";
+		item_type_string = "Armour,";
 	}
 	break;
 
 	case consumable:
 	{
-		item_type_string = "Consumable, ";
+		item_type_string = "Consumable,";
 	}
 	break;
 
 	case utility:
 	{
-		item_type_string = "Utility, ";
+		item_type_string = "Utility,";
 	}
 	}
-	std::string item_info = name + ", " + item_type_string + "$" + std::to_string(price) + ", " + std::to_string(quantity);
+	std::string item_info = name + "," + item_type_string + std::to_string(price) + "," + std::to_string(quantity);
 	return item_info;
 }
 

@@ -26,7 +26,7 @@ int NumCheck(int _num)
 {
 	std::cin.ignore(100000, '\n'); // Clears floating points
 	// Don't accept a number less than or equal to 0
-	while (std::cin.fail() || _num < 0 || _num > 100)
+	while (std::cin.fail() || _num < 0)
 	{
 		std::cin.clear();
 		std::cin.ignore(100000, '\n'); // Clears floating points
@@ -43,7 +43,7 @@ int NumCheck(int _num)
 float NumCheck(float _num)
 {
 	// Don't accept a number less than or equal to 0
-	while (std::cin.fail() || _num < 0 || _num > 100)
+	while (std::cin.fail() || _num < 0)
 	{
 		std::cin.clear();
 
@@ -191,7 +191,7 @@ int main()
 			Item NewItem(name, weapon, price, quantity);
 			NewItem.SetType(item_type); // Type is set after
 			NewItem.Display(); // Display the new item to confirm details
-			int key = g_list.NumNodes() + 1; // Set the key as one after the number of nodes
+			int key = g_list.NumNodes() + 1; // Set the key as one position after the number of nodes
 			g_list.InsertTail(key, NewItem); // Insert the item to the end of the list with key
 
 		}
@@ -329,7 +329,13 @@ int main()
 		// Load text file
 		if (action == 6)
 		{
-			g_file_interface.LoadFile();
+			std::cout << "Loading a file will remove current items, are you sure (1: yes, 0: no):";
+			std::cin >> action;
+
+			if (action == 1)
+			{
+				g_file_interface.LoadFile(&g_list);
+			}
 		}
 
 		// Save text file
@@ -340,7 +346,6 @@ int main()
 		}
 
 		// Refresh text on the screen
-		// std::cout << "\n\n";
 		std::cin.clear();
 		std::cin.ignore(100000, '\n'); // Ignore user input
 		SetConsoleTextAttribute(h, 9); // Bright blue text for input

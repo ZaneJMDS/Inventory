@@ -1,6 +1,6 @@
 #pragma once
 #include "Node.h"
-#include "FileInterface.h"
+#include <fstream>
 
 class DLinkedList
 {
@@ -42,6 +42,6 @@ protected:
 	const int start_pos = 0; // Location of the Head node
 	int sort_type = 4; // Can be any of the item types
 	bool sort_order = 0; // 0 for ascending and 1 for descending
-	std::ofstream myfile; // Saving and loading to file
+	std::fstream myfile; // Saving and loading to file
 };
 

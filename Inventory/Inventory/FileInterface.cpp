@@ -8,9 +8,10 @@ FileInterface::~FileInterface()
 {
 }
 
-// TODO
+// Save a text file version of the inventory to the user's computer
 void FileInterface::SaveFile()
 {
+
 	// myfile.open("example.txt");
 	// _list.WriteAll(myfile);
 
@@ -70,10 +71,48 @@ void FileInterface::SaveFile()
 	//}
 }
 
-// TODO
-void FileInterface::LoadFile()
+// Load text file and write to inventory
+void FileInterface::LoadFile(DLinkedList* _list)
 {
-	std::string line;
+	// Will be converted from string to other types later
+	std::string text;
+	std::string ignore = ""; // Ignore first line non data thingy I don't even know anymore
+	std::string name = "";
+	std::string item_type_string = "";
+	std::string price_string = "";
+	std::string quantity_string = "";
+
+	item_types item_type = weapon;
+	float price;
+	int quantity;
+
+	myfile.open("example.txt");
+
+	// std::getline(myfile, ignore);
+	
+	// Loop through entire text file
+	while (getline(myfile, text))
+	{
+		std::getline(myfile, name, ',');
+		std::getline(myfile, item_type_string, ',');
+		std::getline(myfile, price_string, ',');
+		std::getline(myfile, quantity_string); // No comma because end of line
+
+		if (item_type_string == "Weapon") { item_type = weapon; }
+		else if (item_type_string == "Armour" || "Armor") { item_type = armour; }
+		else if (item_type_string == "Consumable") { item_type = consumable; }
+		else { item_type = utility; }
+
+		price = stof(price_string);
+		quantity = stoi(quantity_string);
+
+		// Add a new item
+		Item NewItem(name, item_type, price, quantity);
+		int key = _list->NumNodes() + 1; // Set the key as one position after the number of nodes
+		_list->InsertTail(key, NewItem); // Insert the item to the end of the list with key
+	}
+
+	myfile.close();
 
 	//HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 

@@ -286,7 +286,6 @@ void DLinkedList::DisplayAll()
 void DLinkedList::WriteAll()
 {
 	myfile.open("example.txt");
-	myfile << "Total unique items: " << NumNodes() << "\n"; // Get the number of unique items in the list
 	myfile << "NAME, TYPE, PRICE, QUANTITY\n";
 	Node* curr = mpHead;
 	while (curr != nullptr) {

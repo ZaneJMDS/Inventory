@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h> // Includes windows file explorer
 #include <ShObjIdl.h> // Includes file types
-#include <fstream>
 #include <string>
 #include <iostream>
 #include "DLinkedList.h"
@@ -13,8 +12,8 @@ public:
 	~FileInterface();
 
 	void SaveFile();
-	void LoadFile();
+	void LoadFile(DLinkedList* _list);
 
-	// std::ofstream myfile;
+	std::fstream myfile;
 };
 
