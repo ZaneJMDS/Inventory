@@ -7,18 +7,10 @@ DLinkedList::DLinkedList()
 	nodes = 0;
 }
 
-// Delete each node in the list
+// Delete entire list
 DLinkedList::~DLinkedList()
 {
-	Node* pDelete = mpHead;
-	Node* pNext = nullptr;
-
-	for (int iDelete = 0; iDelete < nodes; iDelete++)
-	{
-		pNext = pDelete->GetNext();
-		delete pDelete;
-		pDelete = pNext;
-	}
+	ClearList();
 }
 
 // Insert a node at the start of the list
@@ -283,21 +275,19 @@ void DLinkedList::DisplayAll()
 }
 
 // Write every node in the list to file
-void DLinkedList::WriteAll()
+void DLinkedList::WriteAll(std::ofstream &_file)
 {
-	myfile.open("example.txt");
-	myfile << "NAME, TYPE, PRICE, QUANTITY\n";
+	_file << "NAME, TYPE, PRICE, QUANTITY\n";
 	Node* curr = mpHead;
 	while (curr != nullptr) {
-		myfile << curr->GetValue().WriteItem();
-		myfile << "\n";
+		_file << curr->GetValue().WriteItem();
+		_file << "\n";
 		curr = curr->GetNext();
 	}
 	std::cout << "SUCCESS\n";
-	myfile.close();
 }
 
-// Swap the values of 2 nodes in the list
+// Swap the items of 2 nodes in the list
 void DLinkedList::Swap(Node* a, Node* b)
 {
 	Item temp = a->GetValue();
@@ -305,11 +295,17 @@ void DLinkedList::Swap(Node* a, Node* b)
 	b->SetValue(temp);
 }
 
-// List used for quick sort segment
+// A segment of quick sort
 Node* DLinkedList::Partition(Node* _min, Node* _max)
 {
 	// Pointer to place smaller elements
 	Node* i = _min->GetPrevious();
+
+	// Set the pivot to the high nodes
+	std::string name = _max->GetValue().GetName();
+	int type_pivot = _max->GetValue().GetType();
+	float price_pivot = _max->GetValue().GetPrice();
+	int quantity_pivot = _max->GetValue().GetQuantity();
 
 	// Iterate through list
 	for (Node* j = _min; j != _max; j = j->GetNext())
@@ -320,10 +316,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Name
 			if (sort_type == 1)
 			{
-				std::string name = _max->GetValue().GetName();
-				// char pivot = name[0];
-
-				if (j->GetValue().GetName() >= name)
+				if (j->GetValue().GetName()[0] >= name[0])
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -334,10 +327,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Type
 			else if (sort_type == 2)
 			{
-				// Set pivot to the high node
-				int pivot = _max->GetValue().GetType();
-
-				if (j->GetValue().GetType() >= pivot)
+				if (j->GetValue().GetType() >= type_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -348,10 +338,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Price
 			else if (sort_type == 3)
 			{
-				// Set pivot to the high node
-				float pivot = _max->GetValue().GetPrice();
-
-				if (j->GetValue().GetPrice() >= pivot)
+				if (j->GetValue().GetPrice() >= price_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -362,10 +349,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Quantity
 			else
 			{
-				// Set pivot to the high node
-				int pivot = _max->GetValue().GetQuantity();
-
-				if (j->GetValue().GetQuantity() >= pivot)
+				if (j->GetValue().GetQuantity() >= quantity_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -380,9 +364,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Name
 			if (sort_type == 1)
 			{
-				std::string pivot = _max->GetValue().GetName();
-
-				if (j->GetValue().GetName() <= pivot)
+				if (j->GetValue().GetName()[0] <= name[0])
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -393,10 +375,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Type
 			else if (sort_type == 2)
 			{
-				// Set pivot to the high node
-				int pivot = _max->GetValue().GetType();
-
-				if (j->GetValue().GetType() <= pivot)
+				if (j->GetValue().GetType() <= type_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -407,10 +386,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Price
 			else if (sort_type == 3)
 			{
-				// Set pivot to the high node
-				float pivot = _max->GetValue().GetPrice();
-
-				if (j->GetValue().GetPrice() <= pivot)
+				if (j->GetValue().GetPrice() <= price_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -421,10 +397,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			// Quantity
 			else
 			{
-				// Set pivot to the high node
-				int pivot = _max->GetValue().GetQuantity();
-
-				if (j->GetValue().GetQuantity() <= pivot)
+				if (j->GetValue().GetQuantity() <= quantity_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -466,6 +439,26 @@ void DLinkedList::Sort(int _sort_type, bool _sort_order)
 
 	// Quick sort starting at the head and going through to the last node
 	QuickSort(mpHead, FindNode(NumNodes()));
+}
+
+// Clears all the nodes in the list
+void DLinkedList::ClearList()
+{
+	if (!IsEmpty())
+	{
+		Node* pDelete = mpHead;
+		Node* pNext = nullptr;
+
+		// Loop through and delete every node
+		for (int iDelete = start_pos; iDelete < nodes; iDelete++)
+		{
+			pNext = pDelete->GetNext();
+			delete pDelete;
+			pDelete = pNext;
+		}
+
+		nodes = 0;
+	}
 }
 
 // Searches the list for the name

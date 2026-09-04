@@ -1,3 +1,10 @@
+/***********************************************************************
+Author      :	Zane Sebastian Jackson
+Mail        :   Zane.Jackson@mds.ac.nz
+Description :	Creates nodes containing items used for a doubly linked list
+File name   :   Node.h
+**************************************************************************/
+
 #pragma once
 #include "Item.h"
 

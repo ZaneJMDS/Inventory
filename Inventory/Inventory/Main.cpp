@@ -1,15 +1,12 @@
 /***********************************************************************
-Bachelor of Software Engineering
-Media Design School,
-New Zealand
-(c) 2026 Media Design School
 Author      :	Zane Sebastian Jackson
 Mail        :   Zane.Jackson@mds.ac.nz
 Description :	Inventory System
+File name   :   Main.cpp
 **************************************************************************/
 
 #include <iostream>
-#include <windows.h> // Colour in the console
+#include <windows.h>
 #include "FileInterface.h"
 #include "Item.h"
 #include "DLinkedList.h"
@@ -21,7 +18,7 @@ void ClearText()
 	std::cout << "\x1b[H"; // Moves text back to top left alligned
 }
 
-// Check user input is an integer
+// Check input is a integer
 int NumCheck(int _num)
 {
 	std::cin.ignore(100000, '\n'); // Clears floating points
@@ -40,6 +37,7 @@ int NumCheck(int _num)
 	return _num;
 }
 
+// Check input is a float
 float NumCheck(float _num)
 {
 	// Don't accept a number less than or equal to 0
@@ -55,43 +53,14 @@ float NumCheck(float _num)
 	return _num;
 }
 
-// Check input is a letter
-std::string StringCheck(std::string _word)
-{
-
-	std::cin.clear();
-	std::cin.ignore(100000, '\n'); // Clears floating points
-
-	// Don't accept invalid letters
-	while (false)
-	{
-		// Keep prompting them until they get it right
-		std::cout << "Please enter a word less than 100 characters: ";
-		std::cin >> _word;
-		std::cin.clear();
-		std::cin.ignore(100000, '\n');
-	}
-
-	return _word;
-}
-
 
 int main()
 {
-	int action = 0;
-	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE); // Allows me to use colour in the console
+	int action = 0; // User can input numbers to select actions
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE); // Colour for the console
 
 	FileInterface g_file_interface;
 	DLinkedList g_list;
-
-	// TEMP DEFAULT INVENTORY
-	Item IPick("Iron Pick", utility, 10.f, 2);
-	Item DSword("Diamond sword", weapon, 15.f, 4);
-	Item NSword("Netherite sword", weapon, 20.f, 1);
-	g_list.InsertHead(0, IPick);
-	g_list.InsertTail(1, DSword);
-	g_list.InsertTail(2, NSword);
-
 
 	// While user hasn't exited
 	while (action != 8)
@@ -112,6 +81,7 @@ int main()
 		SetConsoleTextAttribute(h, 9); // Bright blue text for input
 		std::cout << "Please enter an action: ";
 		std::cin >> action;
+		NumCheck(action);
 
 		ClearText();
 		SetConsoleTextAttribute(h, 7); // White text for display
@@ -132,23 +102,28 @@ int main()
 			int sort_type = 0;
 			bool sort_order = 0;
 
-			std::cout << "Name (1)\n";
-			std::cout << "Type (2)\n";
-			std::cout << "Price (3)\n";
-			std::cout << "Quantity (4)\n";
+			if (g_list.NumNodes() < 2) { std::cout << "Can't sort an list with one or less item"; }
 
-			// Ask the user what variable they want to sort their inventory by
-			std::cout << "\nHow do you want to sort your inventory: ";
-			std::cin >> sort_type;
-			NumCheck(sort_type);
+			else
+			{
+				std::cout << "Name (1)\n";
+				std::cout << "Type (2)\n";
+				std::cout << "Price (3)\n";
+				std::cout << "Quantity (4)\n";
 
-			std::cout << "\nIn ascending (0) or descending (1) order: ";
-			std::cin >> sort_order;
-			NumCheck(sort_order);
+				// Ask the user what variable they want to sort their inventory by
+				std::cout << "\nPlease enter an action to sort your inventory: ";
+				std::cin >> sort_type;
+				NumCheck(sort_type);
 
-			std::cout << "\n";
-			g_list.Sort(sort_type, sort_order);
-			g_list.DisplayAll();
+				std::cout << "\nIn ascending (0) or descending (1) order: ";
+				std::cin >> sort_order;
+				NumCheck(sort_order);
+
+				std::cout << "\n";
+				g_list.Sort(sort_type, sort_order);
+				g_list.DisplayAll();
+			}
 		}
 
 		// Add item
@@ -166,9 +141,9 @@ int main()
 			do {
 				std::cin.clear();
 				std::cin.ignore(100000, '\n'); // Clears floating points
-				std::cout << "Item name (Has to be unique): ";
-				std::getline(std::cin, name);
-			} while (g_list.SearchList(name) != -1);
+				std::cout << "Item name (Has to be unique, and no commas allowed): ";
+				std::getline(std::cin, name); // Stop at a comma
+			} while (g_list.SearchList(name) != -1 || name.find(',') != std::string::npos);  // Loop at a comma or if the user entered the same name
 
 			// Display selectable types
 			std::cout << "Weapon (0)\n";
@@ -203,134 +178,147 @@ int main()
 			int item_type;
 			float price;
 			int quantity;
-			g_list.DisplayAll();
-
-			std::cin.clear();
-			std::cin.ignore(100000, '\n'); // Clears floating points
-
-			// Get user to select an item
-			SetConsoleTextAttribute(h, 9); // Bright blue text for input
-			std::cout << "Enter the EXACT name of an item to DELETE: ";
-			std::getline(std::cin, name);
 			
-			int position = g_list.SearchList(name);
-
-			// See if the entered name matches any item's name
-			if (position != -1)
+			if (g_list.IsEmpty()) { std::cout << "Can't delete an item in a list with no items"; }
+			else
 			{
-				SetConsoleTextAttribute(h, 7); // White text for display
-				std::cout << "\nAre you sure you want to DELETE?\n";
-				g_list.GetNode(position)->GetValue().Display();
+				g_list.DisplayAll();
 
+				std::cin.clear();
+				std::cin.ignore(100000, '\n'); // Clears floating points
+
+				// Get user to select an item
 				SetConsoleTextAttribute(h, 9); // Bright blue text for input
-				std::cout << "Yes (1) or No (0): ";
-				std::cin >> action;
+				std::cout << "Enter the EXACT name of an item to DELETE: ";
+				std::getline(std::cin, name);
 
-				// Delete the node containing the item
-				if (action == 1)
+				int position = g_list.SearchList(name);
+
+				// See if the entered name matches any item's name
+				if (position != -1)
 				{
-					g_list.DeleteBody(position);
-				}
-			}
+					SetConsoleTextAttribute(h, 7); // White text for display
+					std::cout << "\nAre you sure you want to DELETE this item?\n";
+					g_list.GetNode(position)->GetValue().Display();
 
-			else 
-			{
-				std::cout << "Can't find specified item in the list";
+					SetConsoleTextAttribute(h, 9); // Bright blue text for input
+					std::cout << "Yes (1) or No (0): ";
+					std::cin >> action;
+					NumCheck(action);
+
+					// Delete the node containing the item
+					if (action == 1)
+					{
+						g_list.DeleteBody(position);
+					}
+				}
+
+				else
+				{
+					std::cout << "Can't find specified item in the list";
+				}
 			}
 		}
 
 		// Edit item
 		if (action == 5) 
 		{
-			std::string name;
-			g_list.DisplayAll();
-
-			std::cin.clear();
-			std::cin.ignore(100000, '\n'); // Clears floating points
-
-			// Get user to select an item
-			SetConsoleTextAttribute(h, 9); // Bright blue text for input
-			std::cout << "Enter the name of an item to EDIT: ";
-			std::getline(std::cin, name);
-
-			int position = g_list.SearchList(name);
-
-			// See if the entered name matches the items name
-			if (position != -1)
-			{
-				SetConsoleTextAttribute(h, 7); // White text for display
-				g_list.GetNode(position)->GetValue().Display();
-
-				// Prompt user to change stat
-				std::cout << "\nWhat STAT do you want to edit\n\n";
-				std::cout << "Name (1)\n";
-				std::cout << "Type (2)\n";
-				std::cout << "Price (3)\n";
-				std::cout << "Quantity (4)\n";
-
-				SetConsoleTextAttribute(h, 9); // Bright blue text for input
-				std::cout << "Please enter an type: ";
-				std::cin >> action;
-
-				// Edit name
-				if (action == 1)
-				{
-					std::string name = "";
-					std::cout << "Please enter a new name: ";
-					std::cin >> name;
-					StringCheck(name);
-					g_list.GetNode(position)->GetValue().SetName(name);
-				}
-
-				// Edit type
-				if (action == 2)
-				{
-					std::cout << "What TYPE do you want to set to\n\n";
-					std::cout << "Weapon (0)\n";
-					std::cout << "Armour (1)\n";
-					std::cout << "Consumable (2)\n";
-					std::cout << "Utility (3)\n";
-
-					SetConsoleTextAttribute(h, 9); // Bright blue text for input
-					std::cout << "Please enter an action: ";
-					std::cin >> action;
-					NumCheck(action);
-					g_list.GetNode(position)->GetValue().SetType(action);
-				}
-
-				// Edit price
-				if (action == 3)
-				{
-					float price = 0.f;
-					std::cout << "Please enter a new price: ";
-					std::cin >> price;
-					NumCheck(price);
-					g_list.GetNode(position)->GetValue().SetPrice(price);
-				}
-
-				// Edit quantity
-				if (action == 4)
-				{
-					int quantity = 0;
-					std::cout << "Please enter a new quantity: ";
-					std::cin >> quantity;
-					NumCheck(quantity);
-					g_list.GetNode(position)->GetValue().SetQuantity(quantity);
-				}
-			}
-
+			if (g_list.IsEmpty()) { std::cout << "Can't edit an item in a list with no items"; }
 			else
 			{
-				std::cout << "Can't find specified item in the list";
-			}
+				std::string name;
+				g_list.DisplayAll();
 
+				// Get user to select an item
+				SetConsoleTextAttribute(h, 9); // Bright blue text for input
+
+				std::cin.clear();
+				std::cin.ignore(100000, '\n'); // Clears floating points
+				std::cout << "Enter the name of an item to EDIT: ";
+				std::getline(std::cin, name);
+
+				int position = g_list.SearchList(name);
+
+				// See if the entered name matches the items name
+				if (position != -1)
+				{
+					SetConsoleTextAttribute(h, 7); // White text for display
+					g_list.GetNode(position)->GetValue().Display();
+
+					// Prompt user to change stat
+					std::cout << "\nWhat STAT do you want to edit\n\n";
+					std::cout << "Name (1)\n";
+					std::cout << "Type (2)\n";
+					std::cout << "Price (3)\n";
+					std::cout << "Quantity (4)\n";
+
+					SetConsoleTextAttribute(h, 9); // Bright blue text for input
+					std::cout << "Please enter an type: ";
+					std::cin >> action;
+					NumCheck(action);
+
+					// Edit name
+					if (action == 1)
+					{
+						do {
+							std::cin.clear();
+							std::cin.ignore(100000, '\n'); // Clears floating points
+							std::cout << "Please enter a new name: ";
+							std::cin >> name;
+							g_list.GetNode(position)->GetValue().SetName(name);
+						} while (g_list.SearchList(name) != -1 || name.find(',') != std::string::npos);  // Loop at a comma or if the user entered the same name
+					}
+
+					// Edit type
+					if (action == 2)
+					{
+						std::cout << "What TYPE do you want to set to\n\n";
+						std::cout << "Weapon (0)\n";
+						std::cout << "Armour (1)\n";
+						std::cout << "Consumable (2)\n";
+						std::cout << "Utility (3)\n";
+
+						SetConsoleTextAttribute(h, 9); // Bright blue text for input
+						std::cout << "Please enter an action: ";
+						std::cin >> action;
+						NumCheck(action);
+						g_list.GetNode(position)->GetValue().SetType(action);
+					}
+
+					// Edit price
+					if (action == 3)
+					{
+						float price = 0.f;
+						std::cout << "Please enter a new price: ";
+						std::cin >> price;
+						NumCheck(price);
+						g_list.GetNode(position)->GetValue().SetPrice(price);
+					}
+
+					// Edit quantity
+					if (action == 4)
+					{
+						int quantity = 0;
+						std::cout << "Please enter a new quantity: ";
+						std::cin >> quantity;
+						NumCheck(quantity);
+						g_list.GetNode(position)->GetValue().SetQuantity(quantity);
+					}
+				}
+
+				else
+				{
+					std::cout << "Can't find specified item in the list";
+				}
+			}
 		}
 
 		// Load text file
 		if (action == 6)
 		{
-			std::cout << "Loading a file will remove current items, are you sure (1: yes, 0: no):";
+			std::cout << "Loading a file will remove ALL current items, are you sure (1: yes, 0: no): ";
 			std::cin >> action;
+			NumCheck(action);
 
 			if (action == 1)
 			{
@@ -341,8 +329,7 @@ int main()
 		// Save text file
 		if (action == 7)
 		{
-			g_list.WriteAll();
-			// g_file_interface.SaveFile();
+			g_file_interface.SaveFile(&g_list);
 		}
 
 		// Refresh text on the screen

@@ -1,3 +1,10 @@
+/***********************************************************************
+Author      :	Zane Sebastian Jackson
+Mail        :   Zane.Jackson@mds.ac.nz
+Description :	Create a doubly linked list using nodes
+File name   :   DlinkedList.h
+**************************************************************************/
+
 #pragma once
 #include "Node.h"
 #include <fstream>
@@ -27,21 +34,21 @@ public:
 	int NumNodes() { return nodes; };
 	
 	void DisplayAll();
-	void WriteAll();
+	void WriteAll(std::ofstream &_file);
 
 	void Swap(Node* a, Node* b);
 	Node* Partition(Node* _min, Node* _max);
 	void QuickSort(Node* _min, Node* _max);
 	void Sort(int _sort_type, bool _sort_order);
+	void ClearList();
 
 	int SearchList(std::string _name);
 
 protected:
 	Node* mpHead; // Start location
-	int nodes;
+	int nodes; // Amount of nodes in the list
 	const int start_pos = 0; // Location of the Head node
 	int sort_type = 4; // Can be any of the item types
 	bool sort_order = 0; // 0 for ascending and 1 for descending
-	std::fstream myfile; // Saving and loading to file
 };
 

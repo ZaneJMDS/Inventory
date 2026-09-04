@@ -1,3 +1,10 @@
+/***********************************************************************
+Author      :	Zane Sebastian Jackson
+Mail        :   Zane.Jackson@mds.ac.nz
+Description :	Creates items with name, item type, price, and quantity
+File name   :   Item.h
+**************************************************************************/
+
 #pragma once
 #include <string>
 #include <iostream>
