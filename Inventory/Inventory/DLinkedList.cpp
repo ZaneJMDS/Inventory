@@ -267,7 +267,9 @@ void DLinkedList::DisplayAll()
 {
 	std::cout << "Total unique items: " << NumNodes() << "\n"; // Get the number of unique items in the list
 	std::cout << "NAME, TYPE, PRICE, QUANTITY\n";
-	Node* curr = mpHead;
+	Node* curr = mpHead; // Start at the head
+	
+	// Iterate through every node after the sorting algorithim 
 	while (curr != nullptr) {
 		curr->GetValue().Display();
 		curr = curr->GetNext();
@@ -290,9 +292,42 @@ void DLinkedList::WriteAll(std::ofstream &_file)
 // Swap the items of 2 nodes in the list
 void DLinkedList::Swap(Node* a, Node* b)
 {
-	Item temp = a->GetValue();
-	a->SetValue(b->GetValue());
-	b->SetValue(temp);
+	// Dont do anything if the values are the same
+	if (a == b) { return; }
+
+	// Check if the next node in the list is the right one
+	if (b->GetNext() == a)
+	{
+		Node* temp = a;
+		a = b;
+		b = temp;
+	}
+
+	// If there are more than 2 nodes in the list
+	if (b->GetNext() == a)
+	{
+		Node* tempA = a->GetPrevious();
+		Node* tempB = b->GetNext();
+
+		if (a->GetNext() == b)
+		{
+			a->SetPrevious(a->GetNext());
+			b->SetNext(b->GetPrevious());
+		}
+
+		else
+		{
+			a->SetPrevious(b->GetPrevious());
+			b->SetNext(a->GetNext());
+		}
+
+		b->SetPrevious(tempA); // Set Node B to A
+		a->SetNext(tempB); // Set Node A to B
+	}
+
+	// Reset head pointer if head was swapped
+	if (mpHead == a) { mpHead = b; }
+	else if (mpHead == b) { mpHead = a; }
 }
 
 // A segment of quick sort
@@ -438,7 +473,7 @@ void DLinkedList::Sort(int _sort_type, bool _sort_order)
 	sort_order = _sort_order;
 
 	// Quick sort starting at the head and going through to the last node
-	QuickSort(mpHead, FindNode(NumNodes()));
+	QuickSort(mpHead, GetNode(NumNodes()));
 }
 
 // Clears all the nodes in the list
