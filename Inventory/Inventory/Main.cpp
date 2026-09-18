@@ -59,6 +59,7 @@ int main()
 	int action = 0; // User can input numbers to select actions
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE); // Colour for the console
 
+	// Create managers
 	FileInterface g_file_interface;
 	DLinkedList g_list;
 
@@ -106,10 +107,10 @@ int main()
 
 			else
 			{
-				std::cout << "Name (1)\n";
-				std::cout << "Type (2)\n";
-				std::cout << "Price (3)\n";
-				std::cout << "Quantity (4)\n";
+				std::cout << "Name (0)\n";
+				std::cout << "Type (1)\n";
+				std::cout << "Price (2)\n";
+				std::cout << "Quantity (3)\n";
 
 				// Ask the user what variable they want to sort their inventory by
 				std::cout << "\nPlease enter an action to sort your inventory: ";
@@ -165,8 +166,8 @@ int main()
 			// Add a new item
 			Item NewItem(name, weapon, price, quantity);
 			NewItem.SetType(item_type); // Type is set after
-			NewItem.Display(); // Display the new item to confirm details
-			int key = g_list.NumNodes() + 1; // Set the key as one position after the number of nodes
+			std::cout << NewItem.WriteItem() << "\n"; // Display the new item to confirm details
+			int key = g_list.NumNodes(); // Set the key as the current number of nodes
 			g_list.InsertTail(key, NewItem); // Insert the item to the end of the list with key
 
 		}
@@ -175,9 +176,7 @@ int main()
 		if (action == 4) 
 		{
 			std::string name = "";
-			int item_type;
-			float price;
-			int quantity;
+			bool delete_action = 0;
 			
 			if (g_list.IsEmpty()) { std::cout << "Can't delete an item in a list with no items"; }
 			else
@@ -187,36 +186,47 @@ int main()
 				std::cin.clear();
 				std::cin.ignore(100000, '\n'); // Clears floating points
 
-				// Get user to select an item
+				// Ask the user if they want to delete every item or a specific one
 				SetConsoleTextAttribute(h, 9); // Bright blue text for input
-				std::cout << "Enter the EXACT name of an item to DELETE: ";
-				std::getline(std::cin, name);
-
-				int position = g_list.SearchList(name);
-
-				// See if the entered name matches any item's name
-				if (position != -1)
+				std::cout << "Do you want to delete one item (0) or delete all (1): ";
+				std::cin >> delete_action;
+				NumCheck(delete_action);
+				
+				// Delete single item
+				if (delete_action == 0)
 				{
-					SetConsoleTextAttribute(h, 7); // White text for display
-					std::cout << "\nAre you sure you want to DELETE this item?\n";
-					g_list.GetNode(position)->GetValue().Display();
+					std::cout << "Enter the EXACT name of an item to DELETE: ";
+					std::getline(std::cin, name);
 
-					SetConsoleTextAttribute(h, 9); // Bright blue text for input
-					std::cout << "Yes (1) or No (0): ";
-					std::cin >> action;
-					NumCheck(action);
+					int position = g_list.SearchList(name);
 
-					// Delete the node containing the item
-					if (action == 1)
+					// See if the entered name matches any item's name
+					if (position != -1)
 					{
-						g_list.DeleteBody(position);
+						SetConsoleTextAttribute(h, 7); // White text for display
+						std::cout << "\nAre you sure you want to DELETE this item?\n";
+						std::cout << g_list.GetNode(position)->GetValue().WriteItem() << "\n";
+
+						SetConsoleTextAttribute(h, 9); // Bright blue text for input
+						std::cout << "Yes (1) or No (0): ";
+						std::cin >> action;
+						NumCheck(action);
+
+						// Delete the node containing the item
+						if (action == 1)
+						{
+							g_list.DeleteBody(position);
+						}
+					}
+
+					else
+					{
+						std::cout << "Can't find specified item in the list";
 					}
 				}
 
-				else
-				{
-					std::cout << "Can't find specified item in the list";
-				}
+				// Delete all items
+				else { g_list.ClearList(); }
 			}
 		}
 
@@ -243,7 +253,7 @@ int main()
 				if (position != -1)
 				{
 					SetConsoleTextAttribute(h, 7); // White text for display
-					g_list.GetNode(position)->GetValue().Display();
+					std::cout << g_list.GetNode(position)->GetValue().WriteItem() << "\n";
 
 					// Prompt user to change stat
 					std::cout << "\nWhat STAT do you want to edit\n\n";

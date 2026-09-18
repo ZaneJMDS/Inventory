@@ -8,6 +8,7 @@ File name   :   Item.h
 #pragma once
 #include <string>
 #include <iostream>
+#include <format> // For float precision
 
 enum item_types
 {
@@ -24,7 +25,6 @@ public:
 	Item(std::string _name, item_types _item_type, float _price, int _quantity);
 	~Item();
 
-	void Display();
 	std::string WriteItem();
 	
 	// Setters 
@@ -40,7 +40,7 @@ public:
 private:
 	std::string name;
 	item_types item_type;
-	float price;
+	float price = 0.00f;
 	int quantity;
 };
 

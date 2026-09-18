@@ -20,40 +20,6 @@ Item::~Item()
 {
 }
 
-// Print item infromation to the console
-void Item::Display()
-{
-	std::cout << name << ", ";
-	switch (item_type)
-	{
-	case weapon:
-	{
-		std::cout << "Weapon, ";
-	}
-	break;
-
-	case armour:
-	{
-		std::cout << "Armour, ";
-	}
-	break;
-
-	case consumable:
-	{
-		std::cout << "Consumable, ";
-	}
-	break;
-
-	case utility:
-	{
-		std::cout << "Utility, ";
-	}
-	}
-
-	std::cout << "$" << price << ", ";
-	std::cout << quantity << "\n";
-}
-
 // Print item infromation to text file
 std::string Item::WriteItem()
 {
@@ -83,7 +49,9 @@ std::string Item::WriteItem()
 		item_type_string = "Utility,";
 	}
 	}
-	std::string item_info = name + "," + item_type_string + std::to_string(price) + "," + std::to_string(quantity);
+	
+	std::string price_string = std::format("{:.2f}", price);
+	std::string item_info = name + "," + item_type_string + price_string + "," + std::to_string(quantity);
 	return item_info;
 }
 

@@ -125,8 +125,6 @@ void FileInterface::LoadFile(DLinkedList* _list)
 
 						_list->ClearList();
 
-						// myfile.open("example.txt");
-
 						std::getline(myfile, ignore);
 
 						// Loop through entire text file
@@ -146,7 +144,7 @@ void FileInterface::LoadFile(DLinkedList* _list)
 
 							// Add a new item
 							Item NewItem(name, item_type, price, quantity);
-							int key = _list->NumNodes() + 1; // Set the key as one position after the number of nodes
+							int key = _list->NumNodes(); // Set the key as the current position
 							_list->InsertTail(key, NewItem); // Insert the item to the end of the list with key
 						}
 

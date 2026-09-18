@@ -9,6 +9,14 @@ File name   :   DlinkedList.h
 #include "Node.h"
 #include <fstream>
 
+enum sort_types
+{
+	item_name,
+	item_type,
+	item_price,
+	item_quantity
+};
+
 class DLinkedList
 {
 public:
@@ -48,7 +56,7 @@ protected:
 	Node* mpHead; // Start location
 	int nodes; // Amount of nodes in the list
 	const int start_pos = 0; // Location of the Head node
-	int sort_type = 4; // Can be any of the item types
+	sort_types sort_type; // Can be any of the item types
 	bool sort_order = 0; // 0 for ascending and 1 for descending
 };
 

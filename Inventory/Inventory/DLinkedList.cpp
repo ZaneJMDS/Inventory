@@ -271,7 +271,8 @@ void DLinkedList::DisplayAll()
 	
 	// Iterate through every node after the sorting algorithim 
 	while (curr != nullptr) {
-		curr->GetValue().Display();
+		std::cout << curr->GetValue().WriteItem();
+		std::cout << "\n";
 		curr = curr->GetNext();
 	}
 }
@@ -348,47 +349,46 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 		// Ascending order
 		if (sort_order)
 		{
-			// Name
-			if (sort_type == 1)
+			switch (sort_type)
 			{
-				if (j->GetValue().GetName()[0] >= name[0])
+			case item_name:
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					if (j->GetValue().GetName()[0] >= name[0])
+					{
+						// Move i forward and swap with j
+						i = (i == nullptr) ? _min : i->GetNext();
+						Swap(i, j);
+					}
 				}
-			}
 
-			// Type
-			else if (sort_type == 2)
-			{
-				if (j->GetValue().GetType() >= type_pivot)
+			case item_type:
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					if (j->GetValue().GetType() >= type_pivot)
+					{
+						// Move i forward and swap with j
+						i = (i == nullptr) ? _min : i->GetNext();
+						Swap(i, j);
+					}
 				}
-			}
 
-			// Price
-			else if (sort_type == 3)
-			{
-				if (j->GetValue().GetPrice() >= price_pivot)
+			case item_price:
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					if (j->GetValue().GetPrice() >= price_pivot)
+					{
+						// Move i forward and swap with j
+						i = (i == nullptr) ? _min : i->GetNext();
+						Swap(i, j);
+					}
 				}
-			}
 
-			// Quantity
-			else
-			{
-				if (j->GetValue().GetQuantity() >= quantity_pivot)
+			case item_quantity:
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					if (j->GetValue().GetQuantity() >= quantity_pivot)
+					{
+						// Move i forward and swap with j
+						i = (i == nullptr) ? _min : i->GetNext();
+						Swap(i, j);
+					}
 				}
 			}
 		}
@@ -396,8 +396,9 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 		// Descending order
 		else
 		{
-			// Name
-			if (sort_type == 1)
+			switch (sort_type)
+			{
+			case item_name:
 			{
 				if (j->GetValue().GetName()[0] <= name[0])
 				{
@@ -407,8 +408,8 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 				}
 			}
 
-			// Type
-			else if (sort_type == 2)
+
+			case item_type:
 			{
 				if (j->GetValue().GetType() <= type_pivot)
 				{
@@ -418,8 +419,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 				}
 			}
 
-			// Price
-			else if (sort_type == 3)
+			case item_price:
 			{
 				if (j->GetValue().GetPrice() <= price_pivot)
 				{
@@ -429,8 +429,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 				}
 			}
 
-			// Quantity
-			else
+			case item_quantity:
 			{
 				if (j->GetValue().GetQuantity() <= quantity_pivot)
 				{
@@ -438,6 +437,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 					i = (i == nullptr) ? _min : i->GetNext();
 					Swap(i, j);
 				}
+			}
 			}
 		}
 	}
@@ -469,7 +469,11 @@ void DLinkedList::QuickSort(Node* _min, Node* _max)
 
 void DLinkedList::Sort(int _sort_type, bool _sort_order)
 {
-	sort_type = _sort_type;
+	if (_sort_type == 0) { sort_type = item_name; }
+	if (_sort_type == 1) { sort_type = item_type; }
+	if (_sort_type == 2) { sort_type = item_price; }
+	else { sort_type = item_quantity; }
+
 	sort_order = _sort_order;
 
 	// Quick sort starting at the head and going through to the last node
