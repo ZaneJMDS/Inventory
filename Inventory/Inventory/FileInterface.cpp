@@ -143,7 +143,7 @@ void FileInterface::LoadFile(DLinkedList* _list)
 							quantity = stoi(quantity_string);
 
 							// Add a new item
-							Item NewItem(name, item_type, price, quantity);
+							Item* NewItem = new Item(name, item_type, price, quantity);
 							int key = _list->NumNodes(); // Set the key as the current position
 							_list->InsertTail(key, NewItem); // Insert the item to the end of the list with key
 						}

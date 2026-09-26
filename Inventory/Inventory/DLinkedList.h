@@ -23,9 +23,9 @@ public:
 	DLinkedList();
 	~DLinkedList();
 
-	void InsertHead(int iKey, Item _value);
-	void InsertTail(int iKey, Item _value);
-	void InsertBody(int iPosition, int iKey, Item _value);
+	void InsertHead(int iKey, Item* _value);
+	void InsertTail(int iKey, Item* _value);
+	void InsertBody(int iPosition, int iKey, Item* _value);
 
 	void DeleteHead();
 	void DeleteTail();
@@ -54,6 +54,7 @@ public:
 
 protected:
 	Node* mpHead; // Start location
+	Node* mpTail; // End location
 	int nodes; // Amount of nodes in the list
 	const int start_pos = 0; // Location of the Head node
 	sort_types sort_type; // Can be any of the item types

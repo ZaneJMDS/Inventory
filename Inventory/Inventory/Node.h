@@ -15,8 +15,8 @@ public:
 	~Node();
 
 	int GetKey() { return key; }
-	void SetValue(Item _value) { value = _value; }
-	Item GetValue() { return value; }
+	void SetValue(Item* _value) { value = _value; }
+	Item* GetValue() { return value; }
 	
 	void SetNext(Node* _next) { mpNext = _next; }
 	Node* GetNext() { return mpNext; }
@@ -26,7 +26,7 @@ public:
 
 private:
 	int key; // Location of the node in the list
-	Item value;
+	Item* value;
 	Node* mpNext; // Points to the next node
 	Node* mpPrevious; // Points to the previous node
 };

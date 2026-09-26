@@ -7,6 +7,7 @@ File name   :   Main.cpp
 
 #include <iostream>
 #include <windows.h>
+#include <sstream> // Float input validation
 #include "FileInterface.h"
 #include "Item.h"
 #include "DLinkedList.h"
@@ -29,7 +30,7 @@ int NumCheck(int _num)
 		std::cin.ignore(100000, '\n'); // Clears floating points
 
 		// Keep prompting them until they get it right
-		std::cout << "Please enter a valid integer between 0 and 100: ";
+		std::cout << "Please enter a valid integer above 0: ";
 		std::cin >> _num;
 		std::cin.ignore(100000, '\n'); // Clears floating points
 	}
@@ -37,22 +38,31 @@ int NumCheck(int _num)
 	return _num;
 }
 
-// Check input is a float
-float NumCheck(float _num)
-{
-	// Don't accept a number less than or equal to 0
-	while (std::cin.fail() || _num < 0)
-	{
-		std::cin.clear();
-
-		// Keep prompting them until they get it right
-		std::cout << "Please enter a valid integer between 0 and 100: ";
-		std::cin >> _num;
-	}
-
-	return _num;
+bool IsFloat(std::string _input) {
+	std::istringstream iss(_input);
+	float f;
+	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+	// Check the entire string was consumed and if either failbit or badbit is set
+	return iss.eof() && !iss.fail();
 }
 
+// Check input is a float
+float NumCheck(std::string _input)
+{
+	float num;
+
+	// Don't accept a number less than or equal to 0
+	while (!IsFloat(_input))
+	{
+		// Keep prompting them until they get it right
+		std::cout << "Please enter a valid float above 0: ";
+		std::cin >> _input;
+	}
+
+	num = std::stof(_input);
+
+	return num;
+}
 
 int main()
 {
@@ -133,6 +143,7 @@ int main()
 			std::string name;
 			int item_type;
 			float price;
+			std::string temp_price;
 			int quantity;
 
 			// Get the user to enter their item details
@@ -142,9 +153,9 @@ int main()
 			do {
 				std::cin.clear();
 				std::cin.ignore(100000, '\n'); // Clears floating points
-				std::cout << "Item name (Has to be unique, and no commas allowed): ";
+				std::cout << "Item name (Has to be unique, no commas allowed, or empty): ";
 				std::getline(std::cin, name); // Stop at a comma
-			} while (g_list.SearchList(name) != -1 || name.find(',') != std::string::npos);  // Loop at a comma or if the user entered the same name
+			} while (g_list.SearchList(name) != -1 || name.find(',') != std::string::npos || name.empty());  // Loop at a comma or if user entered the same / blank name
 
 			// Display selectable types
 			std::cout << "Weapon (0)\n";
@@ -156,17 +167,17 @@ int main()
 			NumCheck(item_type);
 
 			std::cout << "Price: $";
-			std::cin >> price;
-			NumCheck(price); // Need to add a float checker
+			std::cin >> temp_price;
+			price = NumCheck(temp_price);
 
 			std::cout << "Quantity: ";
 			std::cin >> quantity;
 			NumCheck(quantity);
 
 			// Add a new item
-			Item NewItem(name, weapon, price, quantity);
-			NewItem.SetType(item_type); // Type is set after
-			std::cout << NewItem.WriteItem() << "\n"; // Display the new item to confirm details
+			Item* NewItem = new Item(name, weapon, price, quantity);
+			NewItem->SetType(item_type); // Type is set after
+			std::cout << NewItem->WriteItem() << "\n"; // Display the new item to confirm details
 			int key = g_list.NumNodes(); // Set the key as the current number of nodes
 			g_list.InsertTail(key, NewItem); // Insert the item to the end of the list with key
 
@@ -195,17 +206,23 @@ int main()
 				// Delete single item
 				if (delete_action == 0)
 				{
-					std::cout << "Enter the EXACT name of an item to DELETE: ";
-					std::getline(std::cin, name);
+					int position = 0;
 
-					int position = g_list.SearchList(name);
+					// Only one item in list to delete
+					if (g_list.NumNodes() != 1)
+					{
+						std::cout << "Enter the EXACT name of an item to DELETE: ";
+						std::getline(std::cin, name);
+
+						position = g_list.SearchList(name);
+					}
 
 					// See if the entered name matches any item's name
 					if (position != -1)
 					{
 						SetConsoleTextAttribute(h, 7); // White text for display
 						std::cout << "\nAre you sure you want to DELETE this item?\n";
-						std::cout << g_list.GetNode(position)->GetValue().WriteItem() << "\n";
+						std::cout << g_list.GetNode(position)->GetValue()->WriteItem() << "\n";
 
 						SetConsoleTextAttribute(h, 9); // Bright blue text for input
 						std::cout << "Yes (1) or No (0): ";
@@ -237,23 +254,33 @@ int main()
 			else
 			{
 				std::string name;
+				int position = 0;
 				g_list.DisplayAll();
 
 				// Get user to select an item
 				SetConsoleTextAttribute(h, 9); // Bright blue text for input
 
-				std::cin.clear();
-				std::cin.ignore(100000, '\n'); // Clears floating points
-				std::cout << "Enter the name of an item to EDIT: ";
-				std::getline(std::cin, name);
+				// Only one item in list to delete
+				if (g_list.NumNodes() != 1)
+				{
+					g_list.DisplayAll();
 
-				int position = g_list.SearchList(name);
+					// Get user to select an item
+					SetConsoleTextAttribute(h, 9); // Bright blue text for input
+					
+					std::cin.clear();
+					std::cin.ignore(100000, '\n'); // Clears floating points
+					std::cout << "Enter the name of an item to EDIT: ";
+					std::getline(std::cin, name);
+
+					position = g_list.SearchList(name);
+				}
 
 				// See if the entered name matches the items name
 				if (position != -1)
 				{
 					SetConsoleTextAttribute(h, 7); // White text for display
-					std::cout << g_list.GetNode(position)->GetValue().WriteItem() << "\n";
+					std::cout << g_list.GetNode(position)->GetValue()->WriteItem() << "\n";
 
 					// Prompt user to change stat
 					std::cout << "\nWhat STAT do you want to edit\n\n";
@@ -275,8 +302,8 @@ int main()
 							std::cin.ignore(100000, '\n'); // Clears floating points
 							std::cout << "Please enter a new name: ";
 							std::cin >> name;
-							g_list.GetNode(position)->GetValue().SetName(name);
-						} while (g_list.SearchList(name) != -1 || name.find(',') != std::string::npos);  // Loop at a comma or if the user entered the same name
+							g_list.GetNode(position)->GetValue()->SetName(name);
+						} while (g_list.SearchList(name) != -1 || name.find(',') != std::string::npos || name.empty()); // Loop at a comma or if user entered the same / blank name
 					}
 
 					// Edit type
@@ -292,7 +319,7 @@ int main()
 						std::cout << "Please enter an action: ";
 						std::cin >> action;
 						NumCheck(action);
-						g_list.GetNode(position)->GetValue().SetType(action);
+						g_list.GetNode(position)->GetValue()->SetType(action);
 					}
 
 					// Edit price
@@ -302,7 +329,7 @@ int main()
 						std::cout << "Please enter a new price: ";
 						std::cin >> price;
 						NumCheck(price);
-						g_list.GetNode(position)->GetValue().SetPrice(price);
+						g_list.GetNode(position)->GetValue()->SetPrice(price);
 					}
 
 					// Edit quantity
@@ -312,7 +339,7 @@ int main()
 						std::cout << "Please enter a new quantity: ";
 						std::cin >> quantity;
 						NumCheck(quantity);
-						g_list.GetNode(position)->GetValue().SetQuantity(quantity);
+						g_list.GetNode(position)->GetValue()->SetQuantity(quantity);
 					}
 				}
 
