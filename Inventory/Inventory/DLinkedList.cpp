@@ -4,6 +4,7 @@
 DLinkedList::DLinkedList()
 {
 	mpHead = nullptr;
+	mpTail = nullptr;
 	nodes = 0;
 }
 
@@ -24,6 +25,11 @@ void DLinkedList::InsertHead(int iKey, Item* _value)
 	pNew->SetNext(mpHead);
 	mpHead = pNew;
 
+	// list is empty so set Tail as the head node
+	if (IsEmpty())
+	{
+		mpTail = pNew;
+	}
 	nodes++;
 }
 
@@ -54,20 +60,23 @@ void DLinkedList::InsertTail(int iKey, Item* _value)
 	{
 		mpHead = pNew;
 	}
+
+	mpTail = pNew;
+
 	nodes++;
 }
 
 // Insert a node at the middle of the list
 void DLinkedList::InsertBody(int iPosition, int iKey, Item* _value)
 {
-	if (iPosition == start_pos) { InsertHead(iKey, _value); } // If no nodes already exist
+	if (iPosition == start_pos) { InsertHead(iKey, _value); } // If node is at the start of the list
 
 	else
 	{
 		// Out of list
 		if (iPosition < start_pos)
 		{
-			throw "Parameter iPosition is less than 0";
+			throw "Parameter iPosition is less than the start position";
 		}
 
 		// Out of list
@@ -135,7 +144,7 @@ Node* DLinkedList::ExtractHead()
 	}
 
 	Node* pReturn = mpHead;
-	mpHead = mpHead->GetNext(); // New head becomes the second node in the list
+	mpHead = mpHead->GetNext(); // New HEAD becomes the second node in the list
 
 	nodes--;
 
@@ -157,22 +166,18 @@ Node* DLinkedList::ExtractTail()
 	// List has more than 2 nodes
 	else
 	{
-		Node* pCurrent = mpHead;
-		while (pCurrent->GetNext()->GetNext() != nullptr)
-		{
-			pCurrent = pCurrent->GetNext();
-		}
-		Node* pTail = pCurrent->GetNext();
-		pCurrent->SetNext(nullptr);
+		Node* pReturn = mpTail;
+		mpTail = mpTail->GetPrevious(); // New TAIL becomes the second to last node in the list
+
 		nodes--;
 
-		return pTail;
+		return pReturn;
 	}
 }
 
 Node* DLinkedList::ExtractBody(int iPosition)
 {
-	if (nodes == 0 || iPosition < start_pos || iPosition > nodes)
+	if (nodes == 0 || iPosition < start_pos || iPosition > (nodes - 1))
 	{
 		throw "cannot extract node from an empty list / out of bounds";
 	}
@@ -187,7 +192,7 @@ Node* DLinkedList::ExtractBody(int iPosition)
 		ExtractTail();
 	}
 
-	// Body is not head, tail, or error
+	// Body is not heads or tail
 	else
 	{
 		Node* pCurrent = mpHead;
@@ -207,10 +212,33 @@ Node* DLinkedList::ExtractBody(int iPosition)
 	return nullptr;
 }
 
+int DLinkedList::GetPosition(Node* a)
+{
+	if (IsEmpty())
+	{
+		throw "cannot extract node from an empty list";
+	}
+
+	else
+	{
+		Node* pCurrent = mpHead;
+		int current_position = start_pos;
+		while (pCurrent != nullptr)
+		{
+			if (pCurrent == a) { return current_position; }
+			pCurrent = pCurrent->GetNext();
+			current_position++;
+		}
+
+		// Error
+		return -1;
+	}
+}
+
 // Return a node using the position
 Node* DLinkedList::GetNode(int iPosition)
 {
-	if (IsEmpty() || iPosition < start_pos || iPosition > nodes)
+	if (IsEmpty() || iPosition < start_pos || iPosition > (nodes - 1))
 	{
 		throw "cannot extract node from an empty list / out of bounds";
 	}
@@ -228,10 +256,11 @@ Node* DLinkedList::GetNode(int iPosition)
 		return pCurrent;
 	}
 
+	// Return nullptr if the node couldn't be found
 	return nullptr;
 }
 
-// Return a node using the key
+// Return a node using the key NEEDS UPDATE
 Node* DLinkedList::FindNode(int iKey)
 {
 	if (IsEmpty())
@@ -294,41 +323,46 @@ void DLinkedList::WriteAll(std::ofstream &_file)
 void DLinkedList::Swap(Node* a, Node* b)
 {
 	// Dont do anything if the values are the same
-	if (a == b) { return; }
+	if (a == nullptr || b == nullptr || a == b) { return; }
 
-	// Check if the next node in the list is the right one
-	if (b->GetNext() == a)
+	// Get position of node in the list before they are extracted
+	int a_pos = GetPosition(a);
+	int b_pos = GetPosition(b);
+
+	// ERROR
+	if (a_pos < 0 || b_pos < 0) { return; }
+
+	Node* tempA;
+	Node* tempB;
+
+	// Extract the larger position first
+	if (a_pos > b_pos)
 	{
-		Node* temp = a;
-		a = b;
-		b = temp;
+		// Extract the two nodes
+		tempA = ExtractBody(a_pos);
+		tempB = ExtractBody(b_pos);
+
+		// Insert them with the different keys
+		InsertBody(b_pos, a->GetKey(), a->GetValue()); // New A
+		InsertBody(a_pos, b->GetKey(), b->GetValue()); // New B
 	}
 
-	// If there are more than 2 nodes in the list
-	if (b->GetNext() == a)
+	else
 	{
-		Node* tempA = a->GetPrevious();
-		Node* tempB = b->GetNext();
+		// Extract the two nodes
+		tempB = ExtractBody(b_pos);
+		tempA = ExtractBody(a_pos);
 
-		if (a->GetNext() == b)
-		{
-			a->SetPrevious(a->GetNext());
-			b->SetNext(b->GetPrevious());
-		}
-
-		else
-		{
-			a->SetPrevious(b->GetPrevious());
-			b->SetNext(a->GetNext());
-		}
-
-		b->SetPrevious(tempA); // Set Node B to A
-		a->SetNext(tempB); // Set Node A to B
+		// Insert them with the different keys
+		InsertBody(a_pos, b->GetKey(), b->GetValue()); // New B
+		InsertBody(b_pos, a->GetKey(), a->GetValue()); // New A
 	}
 
-	// Reset head pointer if head was swapped
-	if (mpHead == a) { mpHead = b; }
-	else if (mpHead == b) { mpHead = a; }
+	// Garbage collection without decreasing the numebr of nodes
+	delete tempA;
+	delete tempB;
+	delete a;
+	delete b;
 }
 
 // A segment of quick sort
@@ -361,6 +395,8 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 					}
 				}
 
+				break;
+
 			case item_type:
 				{
 					if (j->GetValue()->GetType() >= type_pivot)
@@ -370,6 +406,8 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 						Swap(i, j);
 					}
 				}
+			
+				break;
 
 			case item_price:
 				{
@@ -381,6 +419,8 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 					}
 				}
 
+				break;
+
 			case item_quantity:
 				{
 					if (j->GetValue()->GetQuantity() >= quantity_pivot)
@@ -390,6 +430,8 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 						Swap(i, j);
 					}
 				}
+
+				break;
 			}
 		}
 
@@ -408,6 +450,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 				}
 			}
 
+			break;
 
 			case item_type:
 			{
@@ -419,6 +462,8 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 				}
 			}
 
+			break;
+
 			case item_price:
 			{
 				if (j->GetValue()->GetPrice() <= price_pivot)
@@ -429,6 +474,8 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 				}
 			}
 
+			break;
+
 			case item_quantity:
 			{
 				if (j->GetValue()->GetQuantity() <= quantity_pivot)
@@ -438,6 +485,9 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 					Swap(i, j);
 				}
 			}
+			
+			break;
+
 			}
 		}
 	}
@@ -454,6 +504,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 // Order the list
 void DLinkedList::QuickSort(Node* _min, Node* _max)
 {
+	// Keep looping as long as the list dosn't exit range
 	if (_min != nullptr && _max != nullptr && _min != _max && _min != _max->GetNext())
 	{
 		// Find the pivot
@@ -467,17 +518,18 @@ void DLinkedList::QuickSort(Node* _min, Node* _max)
 	}
 }
 
+// Sort the list based on the user's specification
 void DLinkedList::Sort(int _sort_type, bool _sort_order)
 {
 	if (_sort_type == 0) { sort_type = item_name; }
-	if (_sort_type == 1) { sort_type = item_type; }
-	if (_sort_type == 2) { sort_type = item_price; }
-	else { sort_type = item_quantity; }
+	else if (_sort_type == 1) { sort_type = item_type; }
+	else if (_sort_type == 2) { sort_type = item_price; }
+	else if (_sort_type == 3) { sort_type = item_quantity; }
 
 	sort_order = _sort_order;
 
-	// Quick sort starting at the head and going through to the last node
-	QuickSort(mpHead, GetNode(NumNodes()));
+	// Quick sort starting at the Head and going through to Tail
+	QuickSort(mpHead, mpTail);
 }
 
 // Clears all the nodes in the list

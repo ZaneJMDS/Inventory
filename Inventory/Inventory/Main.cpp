@@ -131,7 +131,7 @@ int main()
 				std::cin >> sort_order;
 				NumCheck(sort_order);
 
-				std::cout << "\n";
+				std::cout << sort_type << "\n";
 				g_list.Sort(sort_type, sort_order);
 				g_list.DisplayAll();
 			}

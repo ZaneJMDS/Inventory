@@ -35,6 +35,7 @@ public:
 	Node* ExtractTail();
 	Node* ExtractBody(int iPosition);
 
+	int GetPosition(Node* a);
 	Node* GetNode(int iPosition);
 	Node* FindNode(int iKey);
 
@@ -57,7 +58,7 @@ protected:
 	Node* mpTail; // End location
 	int nodes; // Amount of nodes in the list
 	const int start_pos = 0; // Location of the Head node
-	sort_types sort_type; // Can be any of the item types
+	sort_types sort_type = item_name; // Can be any of the item types
 	bool sort_order = 0; // 0 for ascending and 1 for descending
 };
 
