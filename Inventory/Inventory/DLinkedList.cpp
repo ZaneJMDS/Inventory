@@ -71,6 +71,8 @@ void DLinkedList::InsertBody(int iPosition, int iKey, Item* _value)
 {
 	if (iPosition == start_pos) { InsertHead(iKey, _value); } // If node is at the start of the list
 
+	if (iPosition == nodes - 1) { InsertTail(iKey, _value); } // If node is at the end of the list
+
 	else
 	{
 		// Out of list
@@ -326,43 +328,31 @@ void DLinkedList::Swap(Node* a, Node* b)
 	if (a == nullptr || b == nullptr || a == b) { return; }
 
 	// Get position of node in the list before they are extracted
-	int a_pos = GetPosition(a);
-	int b_pos = GetPosition(b);
+/*	int a_pos = GetPosition(a);
 
-	// ERROR
-	if (a_pos < 0 || b_pos < 0) { return; }
+	if (a_pos < 0) { return; }
 
+	// Create a temporary node to 
 	Node* tempA;
-	Node* tempB;
+	tempA = ExtractBody(a_pos);
 
-	// Extract the larger position first
-	if (a_pos > b_pos)
-	{
-		// Extract the two nodes
-		tempA = ExtractBody(a_pos);
-		tempB = ExtractBody(b_pos);
+	int b_pos = GetPosition(b);
+	
+	// If node exceeds bounds of list
+	if (b_pos < 0) { return; }
+	
+	// Insert them with the different keys
+	InsertBody(b_pos, tempA->GetKey(), tempA->GetValue()); // New A*/
 
-		// Insert them with the different keys
-		InsertBody(b_pos, a->GetKey(), a->GetValue()); // New A
-		InsertBody(a_pos, b->GetKey(), b->GetValue()); // New B
-	}
+	// Swap the data pointers/values inside the nodes without touching next/prev pointers
+	Item* tempValue = a->GetValue();
+	int tempKey = a->GetKey();
 
-	else
-	{
-		// Extract the two nodes
-		tempB = ExtractBody(b_pos);
-		tempA = ExtractBody(a_pos);
+	a->SetValue(b->GetValue());
+	a->SetKey(b->GetKey());
 
-		// Insert them with the different keys
-		InsertBody(a_pos, b->GetKey(), b->GetValue()); // New B
-		InsertBody(b_pos, a->GetKey(), a->GetValue()); // New A
-	}
-
-	// Garbage collection without decreasing the numebr of nodes
-	delete tempA;
-	delete tempB;
-	delete a;
-	delete b;
+	b->SetValue(tempValue);
+	b->SetKey(tempKey);
 }
 
 // A segment of quick sort
@@ -387,7 +377,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			{
 			case item_name:
 				{
-					if (j->GetValue()->GetName()[0] >= name[0])
+					if (j->GetValue()->GetName()[0] > name[0])
 					{
 						// Move i forward and swap with j
 						i = (i == nullptr) ? _min : i->GetNext();
@@ -399,7 +389,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_type:
 				{
-					if (j->GetValue()->GetType() >= type_pivot)
+					if (j->GetValue()->GetType() > type_pivot)
 					{
 						// Move i forward and swap with j
 						i = (i == nullptr) ? _min : i->GetNext();
@@ -411,7 +401,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_price:
 				{
-					if (j->GetValue()->GetPrice() >= price_pivot)
+					if (j->GetValue()->GetPrice() > price_pivot)
 					{
 						// Move i forward and swap with j
 						i = (i == nullptr) ? _min : i->GetNext();
@@ -423,7 +413,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_quantity:
 				{
-					if (j->GetValue()->GetQuantity() >= quantity_pivot)
+					if (j->GetValue()->GetQuantity() > quantity_pivot)
 					{
 						// Move i forward and swap with j
 						i = (i == nullptr) ? _min : i->GetNext();
@@ -442,7 +432,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			{
 			case item_name:
 			{
-				if (j->GetValue()->GetName()[0] <= name[0])
+				if (j->GetValue()->GetName()[0] < name[0])
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -454,7 +444,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_type:
 			{
-				if (j->GetValue()->GetType() <= type_pivot)
+				if (j->GetValue()->GetType() < type_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -466,7 +456,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_price:
 			{
-				if (j->GetValue()->GetPrice() <= price_pivot)
+				if (j->GetValue()->GetPrice() < price_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -478,7 +468,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_quantity:
 			{
-				if (j->GetValue()->GetQuantity() <= quantity_pivot)
+				if (j->GetValue()->GetQuantity() < quantity_pivot)
 				{
 					// Move i forward and swap with j
 					i = (i == nullptr) ? _min : i->GetNext();
@@ -495,7 +485,7 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 	// Move i to the correct pivot position
 	i = (i == nullptr) ? _min : i->GetNext();
 
-	// Swap pivot with i's data
+	// Swap pivot (max) with i's data
 	Swap(i, _max);
 
 	return i;

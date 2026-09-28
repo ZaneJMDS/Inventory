@@ -15,6 +15,7 @@ public:
 	~Node();
 
 	int GetKey() { return key; }
+	void SetKey(int _key) { key = _key; }
 	void SetValue(Item* _value) { value = _value; }
 	Item* GetValue() { return value; }
 	
