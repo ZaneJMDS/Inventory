@@ -345,21 +345,27 @@ void DLinkedList::Swap(Node* a, Node* b)
 	InsertBody(b_pos, tempA->GetKey(), tempA->GetValue()); // New A*/
 
 	// Swap the data pointers/values inside the nodes without touching next/prev pointers
+
+
 	Item* tempValue = a->GetValue();
 	int tempKey = a->GetKey();
 
 	a->SetValue(b->GetValue());
 	a->SetKey(b->GetKey());
+	
 
 	b->SetValue(tempValue);
 	b->SetKey(tempKey);
+
+	return;
 }
 
 // A segment of quick sort
 Node* DLinkedList::Partition(Node* _min, Node* _max)
 {
 	// Pointer to place smaller elements
-	Node* i = _min->GetPrevious();
+	Node* boundary = _min;
+	Node* node = _min;
 
 	// Set the pivot to the high nodes
 	std::string name = _max->GetValue()->GetName();
@@ -368,8 +374,10 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 	int quantity_pivot = _max->GetValue()->GetQuantity();
 
 	// Iterate through list
-	for (Node* j = _min; j != _max; j = j->GetNext())
+	while(node != _max)
 	{
+		Node* next_node = node->GetNext();
+
 		// Ascending order
 		if (sort_order)
 		{
@@ -377,11 +385,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			{
 			case item_name:
 				{
-					if (j->GetValue()->GetName()[0] > name[0])
+					if (node->GetValue()->GetName()[0] > name[0])
 					{
-						// Move i forward and swap with j
-						i = (i == nullptr) ? _min : i->GetNext();
-						Swap(i, j);
+						// Move boundary forward and swap with current node
+						Swap(boundary, node);
+						boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 					}
 				}
 
@@ -389,11 +397,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_type:
 				{
-					if (j->GetValue()->GetType() > type_pivot)
+					if (node->GetValue()->GetType() > type_pivot)
 					{
-						// Move i forward and swap with j
-						i = (i == nullptr) ? _min : i->GetNext();
-						Swap(i, j);
+						// Move boundary forward and swap with current node
+						Swap(boundary, node);
+						boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 					}
 				}
 			
@@ -401,11 +409,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_price:
 				{
-					if (j->GetValue()->GetPrice() > price_pivot)
+					if (node->GetValue()->GetPrice() > price_pivot)
 					{
-						// Move i forward and swap with j
-						i = (i == nullptr) ? _min : i->GetNext();
-						Swap(i, j);
+						// Move boundary forward and swap with current node
+						Swap(boundary, node);
+						boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 					}
 				}
 
@@ -413,11 +421,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_quantity:
 				{
-					if (j->GetValue()->GetQuantity() > quantity_pivot)
+					if (node->GetValue()->GetQuantity() > quantity_pivot)
 					{
-						// Move i forward and swap with j
-						i = (i == nullptr) ? _min : i->GetNext();
-						Swap(i, j);
+						// Move boundary forward and swap with current node
+						Swap(boundary, node);
+						boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 					}
 				}
 
@@ -432,11 +440,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 			{
 			case item_name:
 			{
-				if (j->GetValue()->GetName()[0] < name[0])
+				if (node->GetValue()->GetName()[0] < name[0])
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					// Move boundary forward and swap with current node
+					Swap(boundary, node);
+					boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 				}
 			}
 
@@ -444,11 +452,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_type:
 			{
-				if (j->GetValue()->GetType() < type_pivot)
+				if (node->GetValue()->GetType() < type_pivot)
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					// Move boundary forward and swap with current node
+					Swap(boundary, node);
+					boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 				}
 			}
 
@@ -456,11 +464,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_price:
 			{
-				if (j->GetValue()->GetPrice() < price_pivot)
+				if (node->GetValue()->GetPrice() < price_pivot)
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					// Move boundary forward and swap with current node
+					Swap(boundary, node);
+					boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 				}
 			}
 
@@ -468,11 +476,11 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			case item_quantity:
 			{
-				if (j->GetValue()->GetQuantity() < quantity_pivot)
+				if (node->GetValue()->GetQuantity() < quantity_pivot)
 				{
-					// Move i forward and swap with j
-					i = (i == nullptr) ? _min : i->GetNext();
-					Swap(i, j);
+					// Move boundary forward and swap with current node
+					Swap(boundary, node);
+					boundary = (boundary == nullptr) ? _min : boundary->GetNext();
 				}
 			}
 			
@@ -480,15 +488,16 @@ Node* DLinkedList::Partition(Node* _min, Node* _max)
 
 			}
 		}
+		node = next_node;
 	}
 
 	// Move i to the correct pivot position
-	i = (i == nullptr) ? _min : i->GetNext();
+	// boundary = (boundary == nullptr) ? _min : boundary;
 
-	// Swap pivot (max) with i's data
-	Swap(i, _max);
+	// Swap the boundary with the pivot (max)
+	Swap(boundary, _max);
 
-	return i;
+	return boundary;
 }
 
 // Order the list
@@ -498,12 +507,13 @@ void DLinkedList::QuickSort(Node* _min, Node* _max)
 	if (_min != nullptr && _max != nullptr && _min != _max && _min != _max->GetNext())
 	{
 		// Find the pivot
+		// The pivot is already in the right place
 		Node* pivot = Partition(_min, _max);
 
-		// Sort left half
+		// Sort left of the pivot
 		QuickSort(_min, pivot->GetPrevious());
 
-		// Sort right half
+		// Sort right of the pivot
 		QuickSort(pivot->GetNext(), _max);
 	}
 }
