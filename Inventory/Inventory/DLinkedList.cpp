@@ -510,6 +510,8 @@ void DLinkedList::QuickSort(Node* _min, Node* _max)
 		// The pivot is already in the right place
 		Node* pivot = Partition(_min, _max);
 
+		std::cout << "Pivot: " << pivot->GetValue()->WriteItem() << "\n\n";
+
 		// Sort left of the pivot
 		QuickSort(_min, pivot->GetPrevious());
 
